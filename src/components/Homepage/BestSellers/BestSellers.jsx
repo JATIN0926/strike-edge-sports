@@ -37,14 +37,14 @@ export default function BestSellers() {
         viewport={{ once: true }}
         className="mb-8"
       >
-        <h2 className="text-3xl md:text-4xl font-bold text-white">
+        <h2 className="text-3xl md:text-3xl font-bold text-white">
           Best{" "}
           <span className="bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">
             Sellers
           </span>
         </h2>
 
-        <p className="text-white/60 mt-2 max-w-md">
+        <p className="text-white/60 max-w-md text-[0.85rem]">
           Most loved cricket gear chosen by our customers.
         </p>
       </motion.div>

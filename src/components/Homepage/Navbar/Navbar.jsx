@@ -25,6 +25,8 @@ export default function Navbar() {
   const router = useRouter();
 
   const [openAuth, setOpenAuth] = useState(false);
+  const [openProfileMenu, setOpenProfileMenu] = useState(false);
+
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.currentUser);
 
@@ -33,12 +35,12 @@ export default function Navbar() {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-    });
-
-    return () => unsubscribe();
-  }, []);
+    const handleClickOutside = () => setOpenProfileMenu(false);
+    if (openProfileMenu) {
+      window.addEventListener("click", handleClickOutside);
+    }
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, [openProfileMenu]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -67,6 +69,26 @@ export default function Navbar() {
       toast.error("Google sign-in failed", { id: "google-auth" });
     }
   };
+  const handleLogout = async () => {
+    try {
+      // 1️⃣ Logout from Firebase (CRITICAL)
+      await auth.signOut();
+
+      // 2️⃣ Clear backend session (JWT cookie)
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+
+      toast.success("Logged out successfully");
+      setOpenProfileMenu(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Logout failed");
+    }
+  };
+
   const handleNavClick = (item) => {
     if (item.type === "route") {
       router.push(item.href);
@@ -132,16 +154,66 @@ export default function Navbar() {
             </motion.div>
 
             {currentUser ? (
-              <motion.img
-                whileHover={{ scale: 1.05 }}
-                src={currentUser.photoURL}
-                alt="Profile"
-                className="
+              <div className="relative">
+                <motion.img
+                  whileHover={{ scale: 1.05 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenProfileMenu((prev) => !prev);
+                  }}
+                  src={currentUser.photoURL}
+                  alt="Profile"
+                  className="
       h-9 w-9 rounded-full
       object-cover cursor-pointer
       border border-white/20
     "
-              />
+                />
+
+                {/* Dropdown */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={
+                    openProfileMenu
+                      ? { opacity: 1, scale: 1, y: 0 }
+                      : { opacity: 0, scale: 0.95, y: 10 }
+                  }
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  className={`
+      absolute right-0 mt-3 w-40
+      rounded-xl overflow-hidden
+      bg-black/80 backdrop-blur-xl
+      border border-white/15
+      shadow-[0_20px_60px_rgba(0,0,0,0.8)]
+      ${openProfileMenu ? "pointer-events-auto" : "pointer-events-none"}
+    `}
+                >
+                  <button
+                    onClick={() => {
+                      router.push("/profile");
+                      setOpenProfileMenu(false);
+                    }}
+                    className=" cursor-pointer
+        w-full px-4 py-2.5 text-left
+        text-sm text-white/80 hover:text-white
+        hover:bg-white/5 transition
+      "
+                  >
+                    Profile
+                  </button>
+
+                  <button
+                    onClick={handleLogout}
+                    className=" cursor-pointer
+        w-full px-4 py-2.5 text-left
+        text-sm text-red-400 hover:text-red-300
+        hover:bg-white/5 transition
+      "
+                  >
+                    Logout
+                  </button>
+                </motion.div>
+              </div>
             ) : (
               <button
                 onClick={() => setOpenAuth(true)}

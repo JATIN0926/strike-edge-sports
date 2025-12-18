@@ -4,3 +4,7 @@
   --font-sora: 'Sora', sans-serif;
   --font-inter: 'Inter', sans-serif;
 }
+
+::-webkit-scrollbar{
+  display: none;
+}

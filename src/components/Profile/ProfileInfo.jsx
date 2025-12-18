@@ -1,0 +1,235 @@
+"use client";
+
+import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { Info, Plus } from "lucide-react";
+import AddAddressModal from "./AddAddressModal";
+import toast from "react-hot-toast";
+import { setCurrentUser } from "@/redux/user/userSlice";
+import axios from "axios";
+
+export default function ProfileInfo() {
+  const currentUser = useSelector((state) => state.user.currentUser);
+
+  
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [openAddressModal, setOpenAddressModal] = useState(false);
+  
+  const dispatch = useDispatch();
+
+  const validateProfile = () => {
+    if (!name.trim()) {
+      toast.error("Name cannot be empty");
+      return false;
+    }
+
+    if (name.trim().length < 2) {
+      toast.error("Name is too short");
+      return false;
+    }
+
+    if (phone) {
+      const phoneRegex = /^[6-9]\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        toast.error("Please enter a valid 10-digit phone number");
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleSaveProfile = async () => {
+    if (!validateProfile()) return;
+
+    console.log("inside");
+
+    try {
+      toast.loading("Saving changes...", { id: "profile-save" });
+
+      console.log(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`);
+      const res = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`,
+        { name: name.trim(), phone },
+        { withCredentials: true }
+      );
+      console.log("inside 2");
+
+      dispatch(setCurrentUser(res.data.user));
+
+      toast.success("Profile updated successfully", {
+        id: "profile-save",
+      });
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to update profile", {
+        id: "profile-save",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    setName(currentUser.name || "");
+    setPhone(currentUser.phone || "");
+  }, [currentUser]);
+
+  if (!currentUser) {
+    return (
+      <div className="text-white/60">
+        Loading profile...
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="space-y-10">
+        {/* Header */}
+        <h2 className="text-white text-2xl font-semibold">
+          Profile Information
+        </h2>
+
+        {/* User Summary */}
+        <div className="flex items-center gap-5">
+          <div className="relative h-20 w-20">
+            <Image
+              src={currentUser.photoURL}
+              alt="Profile"
+              fill
+              className="rounded-full object-cover border border-white/20"
+            />
+          </div>
+
+          <div>
+            <p className="text-white font-medium">{currentUser.email}</p>
+            <p className="text-white/60 text-sm">Logged in via Google</p>
+          </div>
+        </div>
+
+        {/* Basic Info */}
+        <div className="max-w-lg space-y-4">
+          <div>
+            <label className="text-white/70 text-sm">Full Name</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="
+              mt-1 w-full rounded-xl
+              bg-black/40 border border-white/15
+              px-4 py-2 text-white
+              outline-none focus:border-white/30
+            "
+            />
+          </div>
+
+          <div>
+            <label className="text-white/70 text-sm">Phone Number</label>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+91 XXXXX XXXXX"
+              className="
+              mt-1 w-full rounded-xl
+              bg-black/40 border border-white/15
+              px-4 py-2 text-white
+              outline-none focus:border-white/30
+            "
+            />
+          </div>
+
+          <p className="text-white/50 text-xs flex items-center gap-1">
+            <Info size={12} />
+            You can edit your information anytime. Don’t forget to save your
+            changes.
+          </p>
+
+          <button
+            className="cursor-pointer
+            mt-2 inline-flex items-center justify-center
+            rounded-full bg-white text-black
+            px-6 py-2 text-sm font-medium
+            hover:bg-gray-200 transition
+          "
+            onClick={handleSaveProfile}
+          >
+            Save Changes
+          </button>
+        </div>
+
+        {/* Addresses */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-white text-xl font-semibold">
+              Saved Addresses
+            </h3>
+
+            <button
+              onClick={() => setOpenAddressModal(true)}
+              className="
+    inline-flex items-center gap-2
+    rounded-full border border-white/20
+    px-4 py-2 text-sm text-white
+    hover:bg-white hover:text-black
+    transition
+  "
+            >
+              <Plus size={16} />
+              Add Address
+            </button>
+          </div>
+
+          {/* Address List */}
+          {currentUser.addresses?.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {currentUser.addresses.map((address, index) => (
+                <div
+                  key={index}
+                  className="
+                  rounded-2xl bg-white/5 backdrop-blur-xl
+                  border border-white/10 p-4
+                  flex flex-col gap-2
+                "
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-white font-medium">{address.fullName}</p>
+
+                    {address.isDefault && (
+                      <span className="text-xs text-green-400">Default</span>
+                    )}
+                  </div>
+
+                  <p className="text-white/70 text-sm">
+                    {address.street}, {address.city}, {address.state} -{" "}
+                    {address.pincode}
+                  </p>
+
+                  <p className="text-white/60 text-sm">
+                    Phone: {address.phone}
+                  </p>
+
+                  <div className="flex gap-4 mt-2 text-sm">
+                    <button className="text-white/80 hover:text-white">
+                      Edit
+                    </button>
+                    <button className="text-red-400 hover:text-red-300">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-white/60 text-sm">No addresses added yet.</p>
+          )}
+        </div>
+      </div>
+      <AddAddressModal
+        open={openAddressModal}
+        onClose={() => setOpenAddressModal(false)}
+      />
+    </>
+  );
+}

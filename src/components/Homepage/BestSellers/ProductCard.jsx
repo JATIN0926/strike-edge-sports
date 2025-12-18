@@ -9,7 +9,7 @@ export default function ProductCard({ product }) {
       whileHover={{ y: -8 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="
-        relative group cursor-pointer
+        relative group 
         rounded-2xl overflow-hidden
         bg-[#0b0b0b]
         border border-white/10
@@ -62,7 +62,7 @@ export default function ProductCard({ product }) {
 
         <p
           className="
-            mt-2 text-lg font-medium
+            mt- text-lg font-medium
             text-emerald-400
             font-[var(--font-inter)]
           "
@@ -74,7 +74,7 @@ export default function ProductCard({ product }) {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
           className="
-            mt-4 w-full py-2.5 rounded-full
+            cursor-pointer mt-6 w-full py-2.5 rounded-full
             bg-white text-black text-sm font-semibold
             hover:bg-gray-200 transition
           "

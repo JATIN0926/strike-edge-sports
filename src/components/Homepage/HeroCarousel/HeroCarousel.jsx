@@ -70,7 +70,7 @@ export default function HeroCarousel() {
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-white text-3xl md:text-5xl font-bold max-w-xl"
+              className="text-white text-3xl md:text-5xl font-bold max-w-xl tracking-[-2%]"
             >
               {slides[index].title}
             </motion.h1>
@@ -80,7 +80,7 @@ export default function HeroCarousel() {
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.35 }}
-              className="text-white/80 mt-4 max-w-md"
+              className="text-white/80 mt-2 max-w-md"
             >
               {slides[index].desc}
             </motion.p>
