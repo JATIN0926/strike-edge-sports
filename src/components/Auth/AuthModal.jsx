@@ -14,7 +14,7 @@ export default function AuthModal({ open, onClose, onGoogleSignIn }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md"
           />
 
           {/* Modal */}
@@ -28,39 +28,45 @@ export default function AuthModal({ open, onClose, onGoogleSignIn }) {
               -translate-x-1/2 -translate-y-1/2
               w-[90%] max-w-sm
               rounded-2xl
-              bg-black/80 backdrop-blur-xl
-              border border-white/15
-              shadow-[0_20px_60px_rgba(0,0,0,0.8)]
+              bg-white/80 backdrop-blur-xl
+              border border-black/10
+              shadow-[0_20px_50px_rgba(0,0,0,0.15)]
               p-6
             "
           >
             {/* Close */}
             <button
               onClick={onClose}
-              className="absolute cursor-pointer top-4 right-4 text-white/60 hover:text-white"
+              className="
+                absolute top-4 right-4
+                text-black/50 hover:text-black
+                cursor-pointer
+              "
             >
               <X size={18} />
             </button>
 
             {/* Content */}
             <div className="flex flex-col items-center text-center gap-4">
-              <h2 className="text-white text-xl font-semibold">
+              <h2 className="text-black text-xl font-semibold">
                 Welcome to StrikeEdgeSports
               </h2>
 
-              <p className="text-white/60 text-sm">
+              <p className="text-black/60 text-sm">
                 Sign in to continue shopping premium cricket gear
               </p>
 
               <button
                 onClick={onGoogleSignIn}
-                className=" cursor-pointer
-    mt-4 w-full py-2.5 rounded-full
-    bg-white text-black
-    text-sm font-semibold
-    hover:bg-gray-200 transition
-    flex items-center justify-center gap-3
-  "
+                className="
+                  cursor-pointer mt-4 w-full py-2.5 rounded-full
+                  bg-white text-black
+                  border border-black/15
+                  text-sm font-semibold
+                  hover:bg-emerald-50 hover:border-emerald-300
+                  transition
+                  flex items-center justify-center gap-3
+                "
               >
                 {/* Google Icon */}
                 <svg

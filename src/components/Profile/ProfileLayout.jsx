@@ -29,15 +29,26 @@ export default function ProfileLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-black pt-22">
+    <div className="min-h-screen bg-[#f7f8fa] pt-22">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 flex gap-6">
+        {/* Sidebar */}
         <ProfileSidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           isAdmin={isAdmin}
         />
 
-        <div className="flex-1 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6">
+        {/* Right Content */}
+        <div
+          className="
+            flex-1
+            rounded-2xl
+            bg-white/80 backdrop-blur-xl
+            border border-black/10
+            shadow-[0_10px_30px_rgba(0,0,0,0.08)]
+            p-6
+          "
+        >
           {renderContent()}
         </div>
       </div>

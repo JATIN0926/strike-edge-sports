@@ -4,7 +4,13 @@ import HeroCarousel from "@/components/Homepage/HeroCarousel/HeroCarousel";
 export default function Home() {
   return (
     <>
-      <main className="w-screen max-w-full flex flex-col gap-8 px-3 md:px-8 pt-[5.5rem]">
+      <main className="
+        min-h-screen w-full
+        bg-slate-50
+        flex flex-col gap-10
+        px-4 md:px-8
+        pt-24
+      ">
         <HeroCarousel />
         <BestSellers />
       </main>

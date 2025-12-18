@@ -12,12 +12,17 @@ import axios from "axios";
 export default function ProfileInfo() {
   const currentUser = useSelector((state) => state.user.currentUser);
 
-  
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [openAddressModal, setOpenAddressModal] = useState(false);
-  
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!currentUser) return;
+    setName(currentUser.name || "");
+    setPhone(currentUser.phone || "");
+  }, [currentUser]);
 
   const validateProfile = () => {
     if (!name.trim()) {
@@ -44,18 +49,14 @@ export default function ProfileInfo() {
   const handleSaveProfile = async () => {
     if (!validateProfile()) return;
 
-    console.log("inside");
-
     try {
       toast.loading("Saving changes...", { id: "profile-save" });
 
-      console.log(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`);
       const res = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`,
         { name: name.trim(), phone },
         { withCredentials: true }
       );
-      console.log("inside 2");
 
       dispatch(setCurrentUser(res.data.user));
 
@@ -69,26 +70,15 @@ export default function ProfileInfo() {
     }
   };
 
-  useEffect(() => {
-    if (!currentUser) return;
-
-    setName(currentUser.name || "");
-    setPhone(currentUser.phone || "");
-  }, [currentUser]);
-
   if (!currentUser) {
-    return (
-      <div className="text-white/60">
-        Loading profile...
-      </div>
-    );
+    return <div className="text-black/60">Loading profile…</div>;
   }
 
   return (
     <>
       <div className="space-y-10">
         {/* Header */}
-        <h2 className="text-white text-2xl font-semibold">
+        <h2 className="text-black text-2xl font-semibold">
           Profile Information
         </h2>
 
@@ -99,61 +89,80 @@ export default function ProfileInfo() {
               src={currentUser.photoURL}
               alt="Profile"
               fill
-              className="rounded-full object-cover border border-white/20"
+              className="rounded-full object-cover border border-black/10"
             />
           </div>
 
           <div>
-            <p className="text-white font-medium">{currentUser.email}</p>
-            <p className="text-white/60 text-sm">Logged in via Google</p>
+            <p className="text-black font-medium">{currentUser.email}</p>
+            <p className="text-black/50 text-sm">
+              Logged in via Google
+            </p>
           </div>
         </div>
 
         {/* Basic Info */}
-        <div className="max-w-lg space-y-4">
+        <div
+          className="
+            max-w-lg space-y-4
+            rounded-2xl
+            bg-white/70 backdrop-blur-xl
+            border border-black/10
+            p-6
+          "
+        >
           <div>
-            <label className="text-white/70 text-sm">Full Name</label>
+            <label className="text-black/70 text-sm">Full Name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="
-              mt-1 w-full rounded-xl
-              bg-black/40 border border-white/15
-              px-4 py-2 text-white
-              outline-none focus:border-white/30
-            "
+                mt-1 w-full rounded-xl
+                bg-white border border-black/15
+                px-4 py-2 text-black
+                outline-none
+                focus:border-indigo-500
+                focus:ring-2 focus:ring-indigo-500/20
+              "
             />
           </div>
 
           <div>
-            <label className="text-white/70 text-sm">Phone Number</label>
+            <label className="text-black/70 text-sm">Phone Number</label>
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+91 XXXXX XXXXX"
               className="
-              mt-1 w-full rounded-xl
-              bg-black/40 border border-white/15
-              px-4 py-2 text-white
-              outline-none focus:border-white/30
-            "
+                mt-1 w-full rounded-xl
+                bg-white border border-black/15
+                px-4 py-2 text-black
+                outline-none
+                focus:border-indigo-500
+                focus:ring-2 focus:ring-indigo-500/20
+              "
             />
           </div>
 
-          <p className="text-white/50 text-xs flex items-center gap-1">
+          <p className="text-black/50 text-xs flex items-center gap-1">
             <Info size={12} />
             You can edit your information anytime. Don’t forget to save your
             changes.
           </p>
 
           <button
-            className="cursor-pointer
-            mt-2 inline-flex items-center justify-center
-            rounded-full bg-white text-black
-            px-6 py-2 text-sm font-medium
-            hover:bg-gray-200 transition
-          "
             onClick={handleSaveProfile}
+            className="
+              cursor-pointer
+              mt-2 inline-flex items-center justify-center
+              rounded-full
+              bg-gradient-to-r from-indigo-500 to-blue-500
+              text-white
+              px-6 py-2
+              text-sm font-medium
+              hover:opacity-90 transition
+              shadow-[0_8px_20px_rgba(99,102,241,0.35)]
+            "
           >
             Save Changes
           </button>
@@ -162,59 +171,65 @@ export default function ProfileInfo() {
         {/* Addresses */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-white text-xl font-semibold">
+            <h3 className="text-black text-xl font-semibold">
               Saved Addresses
             </h3>
 
             <button
               onClick={() => setOpenAddressModal(true)}
               className="
-    inline-flex items-center gap-2
-    rounded-full border border-white/20
-    px-4 py-2 text-sm text-white
-    hover:bg-white hover:text-black
-    transition
-  "
+                inline-flex items-center gap-2
+                rounded-full
+                border border-black/15
+                px-4 py-2
+                text-sm text-black
+                hover:bg-black/5 transition
+              "
             >
               <Plus size={16} />
               Add Address
             </button>
           </div>
 
-          {/* Address List */}
           {currentUser.addresses?.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {currentUser.addresses.map((address, index) => (
                 <div
                   key={index}
                   className="
-                  rounded-2xl bg-white/5 backdrop-blur-xl
-                  border border-white/10 p-4
-                  flex flex-col gap-2
-                "
+                    rounded-2xl
+                    bg-white/70 backdrop-blur-xl
+                    border border-black/10
+                    p-4
+                    flex flex-col gap-2
+                  "
                 >
                   <div className="flex items-center justify-between">
-                    <p className="text-white font-medium">{address.fullName}</p>
+                    <p className="text-black font-medium">
+                      {address.fullName}
+                    </p>
 
                     {address.isDefault && (
-                      <span className="text-xs text-green-400">Default</span>
+                      <span className="text-xs text-green-600 font-medium">
+                        Default
+                      </span>
                     )}
                   </div>
 
-                  <p className="text-white/70 text-sm">
-                    {address.street}, {address.city}, {address.state} -{" "}
+                  <p className="text-black/70 text-sm">
+                    {address.street}, {address.city}, {address.state} –{" "}
                     {address.pincode}
                   </p>
 
-                  <p className="text-white/60 text-sm">
+                  <p className="text-black/60 text-sm">
                     Phone: {address.phone}
                   </p>
 
                   <div className="flex gap-4 mt-2 text-sm">
-                    <button className="text-white/80 hover:text-white">
+                    <button className="text-indigo-600 hover:underline">
                       Edit
                     </button>
-                    <button className="text-red-400 hover:text-red-300">
+                    <button className="text-red-500 hover:underline">
                       Delete
                     </button>
                   </div>
@@ -222,10 +237,13 @@ export default function ProfileInfo() {
               ))}
             </div>
           ) : (
-            <p className="text-white/60 text-sm">No addresses added yet.</p>
+            <p className="text-black/60 text-sm">
+              No addresses added yet.
+            </p>
           )}
         </div>
       </div>
+
       <AddAddressModal
         open={openAddressModal}
         onClose={() => setOpenAddressModal(false)}

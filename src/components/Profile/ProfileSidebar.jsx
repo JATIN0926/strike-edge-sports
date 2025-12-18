@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CloudHail } from "lucide-react";
 
 export default function ProfileSidebar({ activeTab, setActiveTab, isAdmin }) {
   const userTabs = [
@@ -19,31 +18,51 @@ export default function ProfileSidebar({ activeTab, setActiveTab, isAdmin }) {
 
   const tabs = isAdmin ? adminTabs : userTabs;
 
-
   return (
-    <div className="w-64 shrink-0 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-4">
-      <h3 className="text-white text-lg font-semibold mb-4">
+    <div
+      className="
+        w-64 shrink-0
+        rounded-2xl
+        bg-white/70 backdrop-blur-xl
+        border border-black/10
+        shadow-[0_8px_24px_rgba(0,0,0,0.06)]
+        p-4
+      "
+    >
+      <h3 className="text-black text-lg font-semibold mb-4">
         {isAdmin ? "Admin Panel" : "My Account"}
       </h3>
 
-      <div className="flex flex-col gap-2">
-        {tabs.map((tab) => (
-          <motion.button
-            key={tab.key}
-            whileHover={{ x: 4 }}
-            onClick={() => setActiveTab(tab.key)}
-            className={`
-              text-left px-4 py-2.5 rounded-xl text-sm transition
-              ${
-                activeTab === tab.key
-                  ? "bg-white text-black font-medium"
-                  : "text-white/70 hover:text-white hover:bg-white/10"
-              }
-            `}
-          >
-            {tab.label}
-          </motion.button>
-        ))}
+      <div className="flex flex-col gap-1.5">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.key;
+
+          return (
+            <motion.button
+              key={tab.key}
+              whileHover={{ x: 4 }}
+              onClick={() => setActiveTab(tab.key)}
+              className={`
+                text-left px-4 py-2.5 rounded-xl text-sm transition
+                ${
+                  isActive
+                    ? `
+                      bg-gradient-to-r from-indigo-500 to-blue-500
+                      text-white font-medium
+                      shadow-[0_6px_18px_rgba(99,102,241,0.35)]
+                    `
+                    : `
+                      text-black/70
+                      hover:text-black
+                      hover:bg-black/5
+                    `
+                }
+              `}
+            >
+              {tab.label}
+            </motion.button>
+          );
+        })}
       </div>
     </div>
   );
