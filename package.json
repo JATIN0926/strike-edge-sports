@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.1",
+    "@tiptap/extension-text-style": "^3.14.0",
+    "@tiptap/react": "^3.14.0",
+    "@tiptap/starter-kit": "^3.14.0",
     "axios": "^1.13.2",
     "firebase": "^12.6.0",
     "framer-motion": "^12.23.26",

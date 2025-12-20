@@ -4,15 +4,25 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { setCurrentUser } from "@/redux/user/userSlice";
+import axios from "axios";
 
-export default function AddAddressModal({ open, onClose }) {
+export default function AddAddressModal({
+  open,
+  onClose,
+  onAddressAdded,
+  mode = "add",          // "add" | "edit"
+  initialData = null,    // address object when editing
+}) {
   const currentUser = useSelector((state) => state.user.currentUser);
 
   const [mounted, setMounted] = useState(false);
   const [useProfileName, setUseProfileName] = useState(false);
   const [useProfilePhone, setUseProfilePhone] = useState(false);
+
+  const dispatch = useDispatch();
 
   const [form, setForm] = useState({
     fullName: "",
@@ -23,23 +33,46 @@ export default function AddAddressModal({ open, onClose }) {
     pincode: "",
   });
 
-  /* ---------- mount for portal (SSR safe) ---------- */
+  /* ---------- mount (portal safe) ---------- */
   useEffect(() => {
-    setTimeout(() => {
-      setMounted(true);
-    }, 0);
+    setTimeout(() => setMounted(true), 0);
     return () => setMounted(false);
   }, []);
 
-  /* ---------- lock body scroll ---------- */
+  /* ---------- body scroll lock ---------- */
   useEffect(() => {
-    if (open) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
-
+    document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  /* ---------- prefill for edit ---------- */
+  useEffect(() => {
+    if (mode === "edit" && initialData) {
+      setForm({
+        fullName: initialData.fullName || "",
+        phone: initialData.phone || "",
+        street: initialData.street || "",
+        city: initialData.city || "",
+        state: initialData.state || "",
+        pincode: initialData.pincode || "",
+      });
+    }
+
+    if (mode === "add") {
+      setForm({
+        fullName: "",
+        phone: "",
+        street: "",
+        city: "",
+        state: "",
+        pincode: "",
+      });
+      setUseProfileName(false);
+      setUseProfilePhone(false);
+    }
+  }, [mode, initialData]);
 
   if (!mounted) return null;
 
@@ -72,6 +105,88 @@ export default function AddAddressModal({ open, onClose }) {
       ...prev,
       phone: !useProfilePhone ? currentUser.phone : "",
     }));
+  };
+
+  /* ---------- validation ---------- */
+  const validateAddress = () => {
+    if (!form.fullName.trim()) {
+      toast.error("Full name is required");
+      return false;
+    }
+
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(form.phone)) {
+      toast.error("Enter a valid 10-digit phone number");
+      return false;
+    }
+
+    if (!form.street.trim()) {
+      toast.error("Street address is required");
+      return false;
+    }
+
+    if (!form.city.trim()) {
+      toast.error("City is required");
+      return false;
+    }
+
+    if (!form.state.trim()) {
+      toast.error("State is required");
+      return false;
+    }
+
+    const pincodeRegex = /^\d{6}$/;
+    if (!pincodeRegex.test(form.pincode)) {
+      toast.error("Enter a valid 6-digit pincode");
+      return false;
+    }
+
+    return true;
+  };
+
+  /* ---------- save (add / edit) ---------- */
+  const handleSaveAddress = async () => {
+    if (!validateAddress()) return;
+
+    try {
+      toast.loading(
+        mode === "edit" ? "Updating address..." : "Saving address...",
+        { id: "address-action" }
+      );
+
+      let res;
+
+      if (mode === "edit") {
+        res = await axios.put(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/address/${initialData._id}`,
+          form,
+          { withCredentials: true }
+        );
+      } else {
+        res = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/address`,
+          form,
+          { withCredentials: true }
+        );
+      }
+
+      dispatch(setCurrentUser(res.data.user));
+
+      toast.success(
+        mode === "edit"
+          ? "Address updated successfully"
+          : "Address added successfully",
+        { id: "address-action" }
+      );
+
+      onAddressAdded?.();
+      onClose();
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message || "Failed to save address",
+        { id: "address-action" }
+      );
+    }
   };
 
   return createPortal(
@@ -117,7 +232,7 @@ export default function AddAddressModal({ open, onClose }) {
               </button>
 
               <h3 className="text-white text-xl font-semibold mb-6">
-                Add New Address
+                {mode === "edit" ? "Edit Address" : "Add New Address"}
               </h3>
 
               {/* FORM */}
@@ -227,6 +342,7 @@ export default function AddAddressModal({ open, onClose }) {
                 </button>
 
                 <button
+                  onClick={handleSaveAddress}
                   className="
                     px-6 py-2 rounded-full
                     bg-white text-black
@@ -235,7 +351,7 @@ export default function AddAddressModal({ open, onClose }) {
                     cursor-pointer
                   "
                 >
-                  Save Address
+                  {mode === "edit" ? "Update Address" : "Save Address"}
                 </button>
               </div>
             </div>

@@ -9,7 +9,7 @@ export const initAuthListener = (dispatch) => {
       const token = await user.getIdToken();
 
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
         { withCredentials: true }
       );
 

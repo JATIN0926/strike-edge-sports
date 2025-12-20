@@ -5,6 +5,9 @@ import ProfileSidebar from "./ProfileSidebar";
 import ProfileInfo from "./ProfileInfo";
 import ComingSoon from "./ComingSoon";
 import { useSelector } from "react-redux";
+import ManageCategories from "./admin/ManageCategories";
+import AddProduct from "./admin/AddProduct";
+import ProductsList from "./admin/Products_Tab/ProductsList";
 
 export default function ProfileLayout() {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -22,6 +25,9 @@ export default function ProfileLayout() {
 
     // admin tabs
     if (isAdmin) {
+      if (activeTab === "categories") return <ManageCategories />;
+      if (activeTab === "add-product") return <AddProduct />;
+      if (activeTab === "products") return <ProductsList />;
       return <ComingSoon />;
     }
 

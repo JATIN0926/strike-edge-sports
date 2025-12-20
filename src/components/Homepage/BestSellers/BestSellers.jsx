@@ -25,6 +25,8 @@ const dummyProducts = [
   },
 ];
 
+
+
 export default function BestSellers() {
   return (
     <section className="w-full mt-10 md:mt-16">

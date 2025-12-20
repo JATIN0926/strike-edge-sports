@@ -4,10 +4,11 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Info, Plus } from "lucide-react";
-import AddAddressModal from "./AddAddressModal";
+import AddAddressModal from "./user/AddAddressModal";
 import toast from "react-hot-toast";
 import { setCurrentUser } from "@/redux/user/userSlice";
 import axios from "axios";
+import DeleteAddressModal from "./user/DeleteAddressModal";
 
 export default function ProfileInfo() {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -15,6 +16,9 @@ export default function ProfileInfo() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [openAddressModal, setOpenAddressModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null);
+  const [addressToEdit, setAddressToEdit] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -53,7 +57,7 @@ export default function ProfileInfo() {
       toast.loading("Saving changes...", { id: "profile-save" });
 
       const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/profile`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/profile`,
         { name: name.trim(), phone },
         { withCredentials: true }
       );
@@ -66,6 +70,63 @@ export default function ProfileInfo() {
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed to update profile", {
         id: "profile-save",
+      });
+    }
+  };
+
+  const fetchLatestUser = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
+        { withCredentials: true }
+      );
+
+      dispatch(setCurrentUser(res.data.user));
+    } catch (err) {
+      toast.error("Failed to refresh user data");
+    }
+  };
+
+  const handleDeleteAddress = async () => {
+    if (!addressToDelete?._id) return;
+
+    try {
+      toast.loading("Deleting address...", { id: "delete-address" });
+
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/address/${addressToDelete._id}`,
+        { withCredentials: true }
+      );
+
+      toast.success("Address deleted", { id: "delete-address" });
+
+      setOpenDeleteModal(false);
+      setAddressToDelete(null);
+
+      fetchLatestUser();
+    } catch (err) {
+      toast.error("Failed to delete address", {
+        id: "delete-address",
+      });
+    }
+  };
+
+  const handleSetDefault = async (addressId) => {
+    try {
+      toast.loading("Updating default address...", { id: "default-address" });
+
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/address/${addressId}/default`,
+        {},
+        { withCredentials: true }
+      );
+
+      dispatch(setCurrentUser(res.data.user));
+
+      toast.success("Default address updated", { id: "default-address" });
+    } catch (err) {
+      toast.error("Failed to update default address", {
+        id: "default-address",
       });
     }
   };
@@ -95,9 +156,7 @@ export default function ProfileInfo() {
 
           <div>
             <p className="text-black font-medium">{currentUser.email}</p>
-            <p className="text-black/50 text-sm">
-              Logged in via Google
-            </p>
+            <p className="text-black/50 text-sm">Logged in via Google</p>
           </div>
         </div>
 
@@ -177,7 +236,7 @@ export default function ProfileInfo() {
 
             <button
               onClick={() => setOpenAddressModal(true)}
-              className="
+              className=" cursor-pointer
                 inline-flex items-center gap-2
                 rounded-full
                 border border-black/15
@@ -205,14 +264,24 @@ export default function ProfileInfo() {
                   "
                 >
                   <div className="flex items-center justify-between">
-                    <p className="text-black font-medium">
-                      {address.fullName}
-                    </p>
+                    <p className="text-black font-medium">{address.fullName}</p>
 
-                    {address.isDefault && (
-                      <span className="text-xs text-green-600 font-medium">
+                    {address.isDefault ? (
+                      <span className="text-xs text-green-600 font-semibold">
                         Default
                       </span>
+                    ) : (
+                      <button
+                        onClick={() => handleSetDefault(address._id)}
+                        className="
+        text-xs font-medium
+        text-indigo-600
+        hover:underline
+        cursor-pointer
+      "
+                      >
+                        Mark as default
+                      </button>
                     )}
                   </div>
 
@@ -226,10 +295,22 @@ export default function ProfileInfo() {
                   </p>
 
                   <div className="flex gap-4 mt-2 text-sm">
-                    <button className="text-indigo-600 hover:underline">
+                    <button
+                      onClick={() => {
+                        setAddressToEdit(address);
+                        setOpenAddressModal(true);
+                      }}
+                      className="text-indigo-600 hover:underline cursor-pointer"
+                    >
                       Edit
                     </button>
-                    <button className="text-red-500 hover:underline">
+                    <button
+                      onClick={() => {
+                        setAddressToDelete(address);
+                        setOpenDeleteModal(true);
+                      }}
+                      className="text-red-500 hover:underline cursor-pointer"
+                    >
                       Delete
                     </button>
                   </div>
@@ -237,9 +318,7 @@ export default function ProfileInfo() {
               ))}
             </div>
           ) : (
-            <p className="text-black/60 text-sm">
-              No addresses added yet.
-            </p>
+            <p className="text-black/60 text-sm">No addresses added yet.</p>
           )}
         </div>
       </div>
@@ -247,6 +326,17 @@ export default function ProfileInfo() {
       <AddAddressModal
         open={openAddressModal}
         onClose={() => setOpenAddressModal(false)}
+        onAddressAdded={fetchLatestUser}
+        mode={addressToEdit ? "edit" : "add"}
+        initialData={addressToEdit}
+      />
+      <DeleteAddressModal
+        open={openDeleteModal}
+        onClose={() => {
+          setOpenDeleteModal(false);
+          setAddressToDelete(null);
+        }}
+        onConfirm={handleDeleteAddress}
       />
     </>
   );
