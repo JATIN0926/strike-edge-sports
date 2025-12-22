@@ -8,6 +8,8 @@ import { useSelector } from "react-redux";
 import ManageCategories from "./admin/ManageCategories";
 import AddProduct from "./admin/AddProduct";
 import ProductsList from "./admin/Products_Tab/ProductsList";
+import AdminOrdersReceived from "./admin/AdminOrdersReceived";
+import MyOrders from "./user/Orders/MyOrders";
 
 export default function ProfileLayout() {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -19,8 +21,12 @@ export default function ProfileLayout() {
     if (activeTab === "profile") return <ProfileInfo />;
 
     // user tabs
-    if (!isAdmin && (activeTab === "orders" || activeTab === "saved")) {
-      return <ComingSoon />;
+    if (!isAdmin) {
+      if (activeTab === "orders") {
+        return <MyOrders />;
+      } else {
+        return <ComingSoon />;
+      }
     }
 
     // admin tabs
@@ -28,6 +34,7 @@ export default function ProfileLayout() {
       if (activeTab === "categories") return <ManageCategories />;
       if (activeTab === "add-product") return <AddProduct />;
       if (activeTab === "products") return <ProductsList />;
+      if (activeTab === "orders-received") return <AdminOrdersReceived />;
       return <ComingSoon />;
     }
 

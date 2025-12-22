@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { initAuthListener } from "@/utils/authListener";
+import { setCurrentUser } from "@/redux/slices/userSlice";
 
 const navItems = [
   { label: "Home", type: "route", href: "/" },
@@ -56,6 +57,13 @@ export default function Navbar() {
       );
 
       toast.success("Logged in successfully 🎉", { id: "google-auth" });
+
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
+        { withCredentials: true }
+      );
+      
+      dispatch(setCurrentUser(res.data.user));
       setOpenAuth(false);
     } catch (err) {
       toast.error("Google sign-in failed", { id: "google-auth" });
@@ -78,6 +86,12 @@ export default function Navbar() {
     }
   };
 
+  const handleNavClick = (item) => {
+    if (item.type === "route") router.push(item.href);
+    if (item.type === "scroll") {
+      document.getElementById(item.target)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
 
   return (
@@ -314,14 +328,14 @@ export default function Navbar() {
                     router.push("/profile");
                     setOpenProfileMenu(false);
                   }}
-                  className="w-full px-4 py-2.5 text-left text-sm text-black/70 hover:bg-black/5"
+                  className=" cursor-pointer w-full px-4 py-2.5 text-left text-sm text-black/70 hover:bg-black/5"
                 >
                   Profile
                 </button>
 
                 <button
                   onClick={handleLogout}
-                  className="w-full px-4 py-2.5 text-left text-sm text-red-500 hover:bg-black/5"
+                  className=" cursor-pointer w-full px-4 py-2.5 text-left text-sm text-red-500 hover:bg-black/5"
                 >
                   Logout
                 </button>

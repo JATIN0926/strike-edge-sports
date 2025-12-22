@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import toast from "react-hot-toast";
-
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { clearCart } from "@/redux/slices/cartSlice";
 import AddAddressModal from "@/components/Profile/user/AddAddressModal";
 import { Phone } from "lucide-react";
 
@@ -20,12 +22,15 @@ export default function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [openAddressModal, setOpenAddressModal] = useState(false);
   const [editAddress, setEditAddress] = useState(null);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cod");
 
-  // ✅ payment state
-  const [paymentMethod, setPaymentMethod] = useState("cod"); // "cod" | "online"
+  const dispatch = useDispatch();
 
   /* ---------------- Guards ---------------- */
   useEffect(() => {
+
+    if (isPlacingOrder) return;
     if (!currentUser) {
       toast.error("Please login to continue");
       router.push("/");
@@ -35,7 +40,7 @@ export default function CheckoutPage() {
     if (cartArray.length === 0) {
       router.push("/cart");
     }
-  }, [currentUser, cartArray, router]);
+  }, [currentUser, cartArray, router, isPlacingOrder]);
 
   /* ---------------- Auto-select default address ---------------- */
   useEffect(() => {
@@ -59,15 +64,74 @@ export default function CheckoutPage() {
 
   const addresses = currentUser?.addresses || [];
 
-  /* ========================== UI ========================== */
+  const handlePlaceOrder = async () => {
+    setIsPlacingOrder(true);
+    if (!selectedAddressId) {
+      toast.error("Please select delivery address");
+      return;
+    }
+
+    if (paymentMethod !== "cod") {
+      toast("Online payment coming soon 🚀");
+      return;
+    }
+
+    const selectedAddress = addresses.find((a) => a._id === selectedAddressId);
+
+    const payload = {
+      items: cartArray.map((item) => ({
+        productId: item.productId,
+        title: item.title,
+        image: item.image,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+
+      shippingAddress: {
+        fullName: selectedAddress.fullName,
+        phone: selectedAddress.phone,
+        street: selectedAddress.street,
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        pincode: selectedAddress.pincode,
+        country: selectedAddress.country || "India",
+      },
+
+      paymentMethod: "COD",
+      subtotal,
+      deliveryCharge,
+      totalAmount: total,
+    };
+
+    try {
+      toast.loading("Placing your order...", { id: "place-order" });
+
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/orders`,
+        payload,
+        { withCredentials: true }
+      );
+
+      toast.success("Order placed successfully 🎉", {
+        id: "place-order",
+      });
+
+      dispatch(clearCart());
+      router.push("/order-success");
+    } catch (err) {
+      setIsPlacingOrder(false);
+      console.log(err);
+      toast.error(err?.response?.data?.message || "Failed to place order", {
+        id: "place-order",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f7f8fa] pt-28">
       <div className="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-3 gap-10">
-
         {/* ================= LEFT ================= */}
         <div className="lg:col-span-2 space-y-12">
-
           {/* ---------- Address Section ---------- */}
           <div>
             <div className="flex items-center justify-between mb-5">
@@ -209,9 +273,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
 
-                  <p className="font-medium">
-                    ₹ {item.price * item.quantity}
-                  </p>
+                  <p className="font-medium">₹ {item.price * item.quantity}</p>
                 </motion.div>
               ))}
             </div>
@@ -299,9 +361,7 @@ export default function CheckoutPage() {
               />
               <div className="flex-1">
                 <p className="text-sm font-medium">Online Payment</p>
-                <p className="text-xs text-black/60">
-                  UPI, Cards, Netbanking
-                </p>
+                <p className="text-xs text-black/60">UPI, Cards, Netbanking</p>
               </div>
               <span className="text-xs px-2 py-0.5 rounded-full bg-black/5 text-black/60">
                 Coming Soon
@@ -314,14 +374,8 @@ export default function CheckoutPage() {
             whileHover={{ scale: selectedAddressId ? 1.02 : 1 }}
             whileTap={{ scale: 0.97 }}
             disabled={!selectedAddressId}
-            onClick={() => {
-              if (paymentMethod === "cod") {
-                toast.success("Order placed with Cash on Delivery");
-              } else {
-                toast("Redirecting to payment gateway…");
-              }
-            }}
-            className={`
+            onClick={handlePlaceOrder}
+            className={` cursor-pointer
               w-full mt-6 py-3 rounded-full font-medium transition
               ${
                 selectedAddressId
