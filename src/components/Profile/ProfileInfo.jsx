@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Info, Plus } from "lucide-react";
 import AddAddressModal from "./user/AddAddressModal";
 import toast from "react-hot-toast";
-import { setCurrentUser } from "@/redux/user/userSlice";
+import { setCurrentUser } from "@/redux/slices/userSlice";
 import axios from "axios";
 import DeleteAddressModal from "./user/DeleteAddressModal";
 

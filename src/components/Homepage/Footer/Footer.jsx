@@ -12,10 +12,8 @@ export default function Footer() {
         className="mt-24 bg-slate-50 border-t border-black/10"
       >
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-14">
-          
           {/* Top section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
-            
             {/* Left - Brand */}
             <div>
               <h2 className="text-black text-2xl font-bold tracking-wide">
@@ -28,9 +26,7 @@ export default function Footer() {
 
             {/* Middle - Contact */}
             <div className="flex flex-col items-start gap-3">
-              <h3 className="text-black font-semibold">
-                Contact Us
-              </h3>
+              <h3 className="text-black font-semibold">Contact Us</h3>
 
               <div className="flex items-center gap-2 text-black/70 text-sm">
                 <Phone size={16} />
@@ -39,7 +35,7 @@ export default function Footer() {
 
               <motion.a
                 whileHover={{ scale: 1.05 }}
-                href="https://wa.me/919876543210"
+                href="https://wa.me/918923765865"
                 target="_blank"
                 className="
                   mt-2 inline-flex items-center gap-2
@@ -56,15 +52,12 @@ export default function Footer() {
 
             {/* Right - Address */}
             <div>
-              <h3 className="text-black font-semibold">
-                Address
-              </h3>
+              <h3 className="text-black font-semibold">Address</h3>
               <div className="flex items-start gap-2 text-black/60 text-sm mt-2">
                 <MapPin size={16} className="mt-1" />
                 <p className="max-w-xs">
-                  Strike Edge Sports,  
-                  Main Market Road,  
-                  Sector 12, New Delhi, India
+                  Gali no 1, sector 1 , hari nagar, shardhapuri, kankarkhera,
+                  Meerut,Uttar Pradesh ,  India
                 </p>
               </div>
             </div>

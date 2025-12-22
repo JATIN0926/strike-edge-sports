@@ -6,15 +6,15 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { setCurrentUser } from "@/redux/user/userSlice";
+import { setCurrentUser } from "@/redux/slices/userSlice";
 import axios from "axios";
 
 export default function AddAddressModal({
   open,
   onClose,
   onAddressAdded,
-  mode = "add",          // "add" | "edit"
-  initialData = null,    // address object when editing
+  mode = "add", // "add" | "edit"
+  initialData = null, // address object when editing
 }) {
   const currentUser = useSelector((state) => state.user.currentUser);
 
@@ -182,10 +182,9 @@ export default function AddAddressModal({
       onAddressAdded?.();
       onClose();
     } catch (err) {
-      toast.error(
-        err?.response?.data?.message || "Failed to save address",
-        { id: "address-action" }
-      );
+      toast.error(err?.response?.data?.message || "Failed to save address", {
+        id: "address-action",
+      });
     }
   };
 

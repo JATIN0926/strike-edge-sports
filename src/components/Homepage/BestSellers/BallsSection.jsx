@@ -1,50 +1,59 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import axios from "axios";
+import toast from "react-hot-toast";
 import ProductCard from "../BestSellers/ProductCard";
 
-const BALL_DATA = {
+const API = process.env.NEXT_PUBLIC_API_URL;
+
+/* Category slug mapping */
+const BALL_TYPES = {
   red: {
     label: "Red Leather",
-    products: [
-      {
-        id: "red-30",
-        name: "Red Leather Ball – 30 Overs (Pack of 6)",
-        price: "1,650",
-        image: "/images/hero1.jpg",
-      },
-      {
-        id: "red-50",
-        name: "Red Leather Ball – 50 Overs (Pack of 6)",
-        price: "2,100",
-        image: "/images/hero2.jpg",
-      },
-    ],
+    slug: "red-leather-ball",
   },
-
   white: {
     label: "White Leather",
-    products: [
-      {
-        id: "white-30",
-        name: "White Leather Ball – 30 Overs (Pack of 6)",
-        price: "1,710",
-        image: "/images/hero2.jpg",
-      },
-      {
-        id: "white-50",
-        name: "White Leather Ball – 50 Overs (Pack of 6)",
-        price: "2,160",
-        image: "/images/hero1.jpg",
-      },
-    ],
+    slug: "white-leather-ball",
   },
 };
 
 export default function BallsSection() {
   const [activeType, setActiveType] = useState("red");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  /* ---------------- Fetch Balls ---------------- */
+  const fetchBalls = async (typeKey) => {
+    try {
+      setLoading(true);
+
+      const res = await axios.get(
+        `${API}/api/products/category/${BALL_TYPES[typeKey].slug}`,
+        {
+          params: {
+            type: "ball",
+            limit: 3, // 🔥 homepage rule
+          },
+        }
+      );
+
+      setProducts(res.data.products || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load balls");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ---------------- Initial + Toggle ---------------- */
+  useEffect(() => {
+    fetchBalls(activeType);
+  }, [activeType]);
 
   return (
     <section className="w-full mt-20">
@@ -70,7 +79,7 @@ export default function BallsSection() {
 
       {/* Toggle Headings */}
       <div className="flex gap-10 mb-10 items-center justify-center">
-        {Object.keys(BALL_DATA).map((key) => {
+        {Object.keys(BALL_TYPES).map((key) => {
           const isActive = key === activeType;
           return (
             <motion.h3
@@ -81,7 +90,7 @@ export default function BallsSection() {
                 ${isActive ? "text-black" : "text-black/30 hover:text-black/60"}
               `}
             >
-              {BALL_DATA[key].label}
+              {BALL_TYPES[key].label}
               {isActive && (
                 <motion.div
                   layoutId="ballUnderline"
@@ -102,43 +111,51 @@ export default function BallsSection() {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
           className="
-    grid grid-cols-1 sm:grid-cols-2
-    gap-6
-    max-w-3xl
-    mx-auto
-  "
+            grid grid-cols-1 sm:grid-cols-2
+            gap-6
+            max-w-3xl
+            mx-auto
+          "
         >
-          {BALL_DATA[activeType].products.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              {/* Same Product Card */}
-              <ProductCard product={product} />
+          {loading
+            ? Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[420px] rounded-2xl bg-black/10 animate-pulse"
+                />
+              ))
+            : products.map((product, index) => (
+                <motion.div
+                  key={product._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="relative"
+                >
+                  <ProductCard product={product} />
 
-              {/* Explore Button */}
-              <div className="mt-4 flex justify-center">
-                <Link href={`/products?category=balls&type=${activeType}`}>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="
-                      text-sm font-medium
-                      text-black border-b border-black/30
-                      hover:border-black
-                      transition
-                    "
-                  >
-                    Explore →
-                  </motion.button>
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+                  {/* Explore Button */}
+                  <div className="mt-4 flex justify-center">
+                    <Link
+                      href={`/products?category=${BALL_TYPES[activeType].slug}&type=ball`}
+                    >
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="
+                          text-sm font-medium
+                          text-black border-b border-black/30
+                          hover:border-black
+                          transition
+                        "
+                      >
+                        Explore →
+                      </motion.button>
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
         </motion.div>
       </AnimatePresence>
     </section>

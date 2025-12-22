@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { currentUser, authChecked } = useSelector((state) => state.user);
- const router = useRouter
+
+  const router = useRouter;
   useEffect(() => {
     if (!authChecked) return; // wait
 

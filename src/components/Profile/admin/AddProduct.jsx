@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { UploadCloud, X, Trash2 } from "lucide-react";
@@ -14,6 +14,8 @@ export default function AddProduct() {
   const [categories, setCategories] = useState([]);
   const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [editorKey, setEditorKey] = useState(0);
+  const fileInputRef = useRef();
 
   const [form, setForm] = useState({
     title: "",
@@ -65,6 +67,10 @@ export default function AddProduct() {
       toast.error("Image upload failed", { id: "upload" });
     } finally {
       setUploading(false);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -103,6 +109,10 @@ export default function AddProduct() {
     } catch (err) {
       console.log(err);
       toast.error("Failed to remove image from Cloudinary");
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -141,6 +151,7 @@ export default function AddProduct() {
         attributes: [],
       });
       setImages([]);
+      setEditorKey((prev) => prev + 1);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add product", {
         id: "save-product",
@@ -243,6 +254,7 @@ export default function AddProduct() {
         <label className="block text-sm font-medium mb-1">Description</label>
 
         <ProductDescriptionEditor
+          key={editorKey}
           value={form.description}
           onChange={(html) => setForm({ ...form, description: html })}
         />
@@ -299,6 +311,7 @@ export default function AddProduct() {
             Click to upload multiple images
           </span>
           <input
+            ref={fileInputRef}
             type="file"
             multiple
             hidden

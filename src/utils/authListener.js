@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 import axios from "axios";
-import { setCurrentUser, logoutUser } from "@/redux/user/userSlice";
+import { setCurrentUser, logoutUser } from "@/redux/slices/userSlice";
 
 export const initAuthListener = (dispatch) => {
   onAuthStateChanged(auth, async (user) => {

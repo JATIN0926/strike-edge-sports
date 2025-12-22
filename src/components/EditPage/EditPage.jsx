@@ -42,7 +42,7 @@ export default function EditProduct({ productId }) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`${API}/api/products/${productId}`, {
+        const res = await axios.get(`${API}/api/products/edit/${productId}`, {
           withCredentials: true,
         });
 

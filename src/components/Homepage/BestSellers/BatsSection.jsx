@@ -1,62 +1,57 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Link from "next/link";
-import ProductCard from "../BestSellers/ProductCard"; 
-// ⬆️ path adjust if needed
+import ProductCard from "../BestSellers/ProductCard";
 
-const BAT_DATA = {
+const API = process.env.NEXT_PUBLIC_API_URL;
+
+const BAT_CATEGORIES = {
   english: {
     label: "English Willow",
-    products: [
-      {
-        id: "eng-1",
-        name: "English Willow – Novice",
-        price: "12,000",
-        image: "/images/hero2.jpg",
-      },
-      {
-        id: "eng-2",
-        name: "English Willow – Intermediate",
-        price: "18,000",
-        image: "/images/hero1.jpg",
-      },
-      {
-        id: "eng-3",
-        name: "English Willow – Elite",
-        price: "24,000",
-        image: "/images/hero3.jpg",
-      },
-    ],
+    slug: "english-willow",
   },
   kashmiri: {
     label: "Kashmiri Willow",
-    products: [
-      {
-        id: "kas-1",
-        name: "Kashmiri Willow – Beginner",
-        price: "2,500",
-        image: "/images/hero1.jpg",
-      },
-      {
-        id: "kas-2",
-        name: "Kashmiri Willow – Grade A",
-        price: "3,500",
-        image: "/images/hero2.jpg",
-      },
-      {
-        id: "kas-3",
-        name: "Kashmiri Willow – Grade A+",
-        price: "5,500",
-        image: "/images/hero3.jpg",
-      },
-    ],
+    slug: "kashmiri-willow",
   },
 };
 
 export default function BatsSection() {
   const [activeType, setActiveType] = useState("english");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  /* ---------------- Fetch by Category Slug ---------------- */
+  useEffect(() => {
+    const fetchCategoryProducts = async () => {
+      try {
+        setLoading(true);
+
+        const { slug } = BAT_CATEGORIES[activeType];
+
+        const res = await axios.get(
+          `${API}/api/products/category/${slug}`,
+          {
+            params: {
+              type: "bat",
+              limit: 3,
+            },
+          }
+        );
+
+        setProducts(res.data.products);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategoryProducts();
+  }, [activeType]);
 
   return (
     <section className="w-full mt-16">
@@ -80,9 +75,9 @@ export default function BatsSection() {
         </p>
       </motion.div>
 
-      {/* Toggle Headings */}
-      <div className="flex gap-10 mb-10  items-center justify-center">
-        {Object.keys(BAT_DATA).map((key) => {
+      {/* Toggle */}
+      <div className="flex gap-10 mb-10 items-center justify-center">
+        {Object.keys(BAT_CATEGORIES).map((key) => {
           const isActive = key === activeType;
           return (
             <motion.h3
@@ -97,7 +92,7 @@ export default function BatsSection() {
                 }
               `}
             >
-              {BAT_DATA[key].label}
+              {BAT_CATEGORIES[key].label}
               {isActive && (
                 <motion.div
                   layoutId="batUnderline"
@@ -119,41 +114,37 @@ export default function BatsSection() {
           transition={{ duration: 0.3 }}
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
         >
-          {BAT_DATA[activeType].products.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              {/* Same Product Card */}
-              <ProductCard product={product} />
-
-              {/* Explore Button */}
-              <div className="mt-6 flex justify-center ">
-                <Link
-                  href={`/products?category=bats&type=${activeType}`}
-                >
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="cursor-pointer
-                      text-sm font-medium
-                      text-black border-b border-black/30
-                      hover:border-black
-                      transition
-                    "
-                  >
-                    Explore →
-                  </motion.button>
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+          {loading
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-[380px] rounded-2xl bg-black/10 animate-pulse"
+                />
+              ))
+            : products.slice(0, 3).map((product) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                />
+              ))}
         </motion.div>
       </AnimatePresence>
+
+      {/* Explore */}
+      {!loading && products.length > 0 && (
+        <div className="mt-10 flex justify-center">
+          <Link
+            href={`/products?category=${products[0].category.slug}&type=bat`}
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="text-sm font-medium text-black border-b border-black/30 hover:border-black transition"
+            >
+              Explore →
+            </motion.button>
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

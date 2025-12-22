@@ -16,7 +16,7 @@ export default function Home() {
       "
       >
         <HeroCarousel />
-        <BestSellers />
+        {/* <BestSellers /> */}
         <BatsSection />
         <BallsSection />
       </main>
