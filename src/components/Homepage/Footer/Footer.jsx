@@ -29,8 +29,14 @@ export default function Footer() {
               <h3 className="text-black font-semibold">Contact Us</h3>
 
               <div className="flex items-center gap-2 text-black/70 text-sm">
-                <Phone size={16} />
-                <span>+91 98765 43210</span>
+                <motion.a
+                  whileHover={{ x: 2 }}
+                  href="tel:+918923765865"
+                  className="flex items-center gap-2 text-black/70 text-sm hover:text-black transition"
+                >
+                  <Phone size={16} />
+                  Call Us
+                </motion.a>
               </div>
 
               <motion.a
@@ -57,7 +63,7 @@ export default function Footer() {
                 <MapPin size={16} className="mt-1" />
                 <p className="max-w-xs">
                   Gali no 1, sector 1 , hari nagar, shardhapuri, kankarkhera,
-                  Meerut,Uttar Pradesh ,  India
+                  Meerut,Uttar Pradesh , India
                 </p>
               </div>
             </div>

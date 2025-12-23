@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import ProductCard from "../BestSellers/ProductCard";
+import ProductCardSkeleton from "@/components/Products/ProductCardSkeleton";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -32,15 +33,12 @@ export default function BatsSection() {
 
         const { slug } = BAT_CATEGORIES[activeType];
 
-        const res = await axios.get(
-          `${API}/api/products/category/${slug}`,
-          {
-            params: {
-              type: "bat",
-              limit: 3,
-            },
-          }
-        );
+        const res = await axios.get(`${API}/api/products/category/${slug}`, {
+          params: {
+            type: "bat",
+            limit: 3,
+          },
+        });
 
         setProducts(res.data.products);
       } catch (err) {
@@ -85,11 +83,7 @@ export default function BatsSection() {
               onClick={() => setActiveType(key)}
               whileHover={{ scale: 1.05 }}
               className={`cursor-pointer text-3xl md:text-4xl font-extrabold transition
-                ${
-                  isActive
-                    ? "text-black"
-                    : "text-black/30 hover:text-black/60"
-                }
+                ${isActive ? "text-black" : "text-black/30 hover:text-black/60"}
               `}
             >
               {BAT_CATEGORIES[key].label}
@@ -116,16 +110,25 @@ export default function BatsSection() {
         >
           {loading
             ? Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-[380px] rounded-2xl bg-black/10 animate-pulse"
-                />
+                <motion.div
+                  key={`skeleton-${i}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <ProductCardSkeleton />
+                </motion.div>
               ))
             : products.slice(0, 3).map((product) => (
-                <ProductCard
+                <motion.div
                   key={product._id}
-                  product={product}
-                />
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
               ))}
         </motion.div>
       </AnimatePresence>

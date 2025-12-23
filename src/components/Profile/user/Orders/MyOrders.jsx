@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 
 import OrderStatusBadge from "./OrderStatusBadge";
 import CancelOrderModal from "./CancelOrderModal";
+import AppLoader from "@/components/Loader/AppLoader";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -54,7 +55,7 @@ export default function MyOrders() {
   };
 
   if (loading) {
-    return <p className="text-black/60">Loading orders…</p>;
+    return <AppLoader text="Loading Order details…" />;
   }
 
   if (orders.length === 0) {

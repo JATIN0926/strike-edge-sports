@@ -6,6 +6,8 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import ProductCard from "@/components/Homepage/BestSellers/ProductCard";
+import AppLoader from "../Loader/AppLoader";
+import { MessageCircle } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -27,7 +29,6 @@ export default function ProductDetail({ productId }) {
           `${API}/api/products/${res.data._id}/related`
         );
 
-        console.log("related", relatedRes);
 
         setRelated(relatedRes.data);
       } catch (err) {
@@ -42,13 +43,9 @@ export default function ProductDetail({ productId }) {
   }, [productId]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-black/60">
-        Loading product…
-      </div>
-    );
+    return <AppLoader text="Loading product details…" />;
   }
-
+  
   if (!product) return null;
 
   /* ========================== UI ========================== */

@@ -1,5 +1,10 @@
+import ProtectedRoute from "@/components/Auth/ProtectedRoute";
 import EditProduct from "@/components/EditPage/EditPage";
 
 export default function EditProductPage({ params }) {
-  return <EditProduct productId={params.id} />;
+  return (
+    <ProtectedRoute>
+      <EditProduct productId={params.id} />
+    </ProtectedRoute>
+  );
 }

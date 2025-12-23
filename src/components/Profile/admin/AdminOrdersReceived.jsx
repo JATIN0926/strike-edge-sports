@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import AppLoader from "@/components/Loader/AppLoader";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LIMIT = 6;
@@ -113,7 +114,7 @@ export default function AdminOrdersReceived() {
 
       {/* Orders */}
       {loading ? (
-        <p className="text-sm text-black/60">Loading orders…</p>
+        <AppLoader text="Loading orders details…" />
       ) : orders.length === 0 ? (
         <p className="text-sm text-black/60">No orders found</p>
       ) : (

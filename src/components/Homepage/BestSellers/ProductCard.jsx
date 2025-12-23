@@ -4,19 +4,14 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addToCart,
-  increaseQty,
-  decreaseQty,
-} from "@/redux/slices/cartSlice";
+import { addToCart, increaseQty, decreaseQty } from "@/redux/slices/cartSlice";
+import { Minus, Plus } from "lucide-react";
 
 export default function ProductCard({ product }) {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const cartItem = useSelector(
-    (state) => state.cart.items[product._id]
-  );
+  const cartItem = useSelector((state) => state.cart.items[product._id]);
 
   const handleAdd = (e) => {
     e.stopPropagation();
@@ -84,9 +79,7 @@ export default function ProductCard({ product }) {
 
       {/* Content */}
       <div className="p-5 bg-[#0b0b0b] relative z-10">
-        <h3 className="text-white text-lg font-semibold">
-          {product.title}
-        </h3>
+        <h3 className="text-white text-lg font-semibold">{product.title}</h3>
 
         <p className="text-emerald-400 text-lg font-medium mt-1">
           ₹ {product.price}
@@ -107,31 +100,57 @@ export default function ProductCard({ product }) {
             Add to Cart
           </motion.button>
         ) : (
-          <div
-            onClick={(e) => e.stopPropagation()}
+          <motion.div
             className="
-              mt-6 flex items-center justify-between
-              bg-white rounded-full px-4 py-2
-            "
+    mt-6 flex items-center justify-center
+    gap-5
+    rounded-full
+    border border-white/20
+    px-4 py-2
+    bg-white/5
+    backdrop-blur
+  "
+            onClick={(e) => e.stopPropagation()}
           >
-            <button
+            {/* MINUS */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               onClick={handleDec}
-              className="text-lg font-bold px-2"
+              className=" cursor-pointer
+      h-7 w-7
+      flex items-center justify-center
+      rounded-full
+      text-white/70
+      hover:text-white
+      hover:bg-white/10
+      transition
+    "
             >
-              −
-            </button>
+              <Minus size={14} />
+            </motion.button>
 
-            <span className="font-semibold">
+            {/* QTY */}
+            <span className="text-white text-sm font-semibold min-w-[16px] text-center">
               {cartItem.quantity}
             </span>
 
-            <button
+            {/* PLUS */}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               onClick={handleInc}
-              className="text-lg font-bold px-2"
+              className=" cursor-pointer
+      h-7 w-7
+      flex items-center justify-center
+      rounded-full
+      text-emerald-400
+      hover:text-emerald-300
+      hover:bg-emerald-400/10
+      transition
+    "
             >
-              +
-            </button>
-          </div>
+              <Plus size={14} />
+            </motion.button>
+          </motion.div>
         )}
       </div>
     </motion.div>

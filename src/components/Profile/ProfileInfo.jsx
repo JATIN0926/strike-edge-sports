@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { setCurrentUser } from "@/redux/slices/userSlice";
 import axios from "axios";
 import DeleteAddressModal from "./user/DeleteAddressModal";
+import AppLoader from "../Loader/AppLoader";
 
 export default function ProfileInfo() {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -132,7 +133,7 @@ export default function ProfileInfo() {
   };
 
   if (!currentUser) {
-    return <div className="text-black/60">Loading profile…</div>;
+    return <AppLoader text="Loading profile details…" />;
   }
 
   return (

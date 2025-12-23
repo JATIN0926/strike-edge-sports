@@ -1,7 +1,7 @@
 import BallsSection from "@/components/Homepage/BestSellers/BallsSection";
 import BatsSection from "@/components/Homepage/BestSellers/BatsSection";
-import BestSellers from "@/components/Homepage/BestSellers/BestSellers";
 import HeroCarousel from "@/components/Homepage/HeroCarousel/HeroCarousel";
+import SeeMoreProductsCTA from "@/components/Homepage/SeeMoreProductsCTA/SeeMoreProductsCTA";
 
 export default function Home() {
   return (
@@ -16,9 +16,9 @@ export default function Home() {
       "
       >
         <HeroCarousel />
-        {/* <BestSellers /> */}
         <BatsSection />
         <BallsSection />
+        <SeeMoreProductsCTA />
       </main>
     </>
   );

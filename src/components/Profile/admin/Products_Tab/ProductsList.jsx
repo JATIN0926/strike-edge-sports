@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ProductAdminCard from "./ProductAdminCard";
+import AppLoader from "@/components/Loader/AppLoader";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LIMIT = 6;
@@ -96,7 +97,7 @@ export default function ProductsList() {
 
       {/* Content */}
       {loading ? (
-        <p className="text-sm text-black/60">Loading products…</p>
+         <AppLoader text="Loading Products…" />
       ) : products.length === 0 ? (
         <div
           className="

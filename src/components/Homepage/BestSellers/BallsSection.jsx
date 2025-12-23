@@ -6,6 +6,7 @@ import Link from "next/link";
 import axios from "axios";
 import toast from "react-hot-toast";
 import ProductCard from "../BestSellers/ProductCard";
+import ProductCardSkeleton from "@/components/Products/ProductCardSkeleton";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -118,12 +119,17 @@ export default function BallsSection() {
           "
         >
           {loading
-            ? Array.from({ length: 2 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-[420px] rounded-2xl bg-black/10 animate-pulse"
-                />
-              ))
+            ? Array.from({ length: 3 }).map((_, i) => (
+              <motion.div
+                key={`skeleton-${i}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <ProductCardSkeleton />
+              </motion.div>
+            ))
             : products.map((product, index) => (
                 <motion.div
                   key={product._id}
