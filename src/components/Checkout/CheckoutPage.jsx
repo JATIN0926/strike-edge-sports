@@ -32,7 +32,6 @@ export default function CheckoutPage() {
       router.replace("/cart");
     }
   }, [cartArray, router]);
-  
 
   /* ---------------- Auto-select default address ---------------- */
   useEffect(() => {
@@ -57,6 +56,23 @@ export default function CheckoutPage() {
   const addresses = currentUser?.addresses || [];
 
   const handlePlaceOrder = async () => {
+    if (!addresses.length) {
+      setOpenAddressModal(true);
+
+      toast("Add a delivery address to place your order 🙂", {
+        icon: "📦",
+      });
+
+      return;
+    }
+
+    if (!selectedAddressId) {
+      toast("Please select a delivery address", {
+        icon: "📍",
+      });
+      return;
+    }
+
     setIsPlacingOrder(true);
     if (!selectedAddressId) {
       toast.error("Please select delivery address");
@@ -363,18 +379,19 @@ export default function CheckoutPage() {
 
           {/* ---------- CTA ---------- */}
           <motion.button
-            whileHover={{ scale: selectedAddressId ? 1.02 : 1 }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
-            disabled={!selectedAddressId}
             onClick={handlePlaceOrder}
-            className={` cursor-pointer
-              w-full mt-6 py-3 rounded-full font-medium transition
-              ${
-                selectedAddressId
-                  ? "bg-black text-white hover:bg-emerald-600"
-                  : "bg-black/40 text-white cursor-not-allowed"
-              }
-            `}
+            className={`cursor-pointer
+    w-full mt-6 py-3 rounded-full font-medium transition
+    ${
+      addresses.length === 0
+        ? "bg-black/60 text-white"
+        : !selectedAddressId
+        ? "bg-black/70 text-white"
+        : "bg-black text-white hover:bg-emerald-600"
+    }
+  `}
           >
             {paymentMethod === "cod"
               ? "Place Order (Cash on Delivery)"

@@ -1,8 +1,10 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle, X } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const REASONS = [
   "Ordered by mistake",
@@ -15,6 +17,11 @@ const REASONS = [
 export default function CancelOrderModal({ open, onClose, onConfirm }) {
   const [reason, setReason] = useState("");
   const [customReason, setCustomReason] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const finalReason = reason === "Other" ? customReason : reason;
 
@@ -24,6 +31,8 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
       // Reset state
       setReason("");
       setCustomReason("");
+    } else {
+      toast.error("Please Select Cancellation Reason");
     }
   };
 
@@ -33,13 +42,15 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
     onClose();
   };
 
-  return (
+  if (!mounted) return null;
+
+  const modalContent = (
     <AnimatePresence>
       {open && (
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -47,7 +58,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 -top-200 z-50 flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 pointer-events-none">
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -71,6 +82,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                   whileTap={{ scale: 0.9 }}
                   onClick={handleClose}
                   className="
+                    cursor-pointer
                     absolute top-4 right-4
                     w-8 h-8 rounded-full
                     bg-white/80 backdrop-blur
@@ -104,7 +116,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-2xl font-bold text-center text-black cursor-pointer"
+                  className="text-2xl font-bold text-center text-black"
                 >
                   Cancel Order
                 </motion.h3>
@@ -211,7 +223,8 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleClose}
-                    className=" cursor-pointer
+                    className="
+                      cursor-pointer
                       flex-1 px-5 py-3 rounded-xl
                       bg-white/70 backdrop-blur
                       border border-black/10
@@ -227,8 +240,8 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                     whileHover={{ scale: finalReason ? 1.02 : 1 }}
                     whileTap={{ scale: finalReason ? 0.98 : 1 }}
                     onClick={handleConfirm}
-                    disabled={!finalReason}
                     className="
+                      cursor-pointer
                       flex-1 px-5 py-3 rounded-xl
                       bg-gradient-to-r from-red-600 to-orange-600
                       text-white font-semibold
@@ -279,4 +292,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
       )}
     </AnimatePresence>
   );
+
+  // Portal se render karo - document.body me
+  return createPortal(modalContent, document.body);
 }
