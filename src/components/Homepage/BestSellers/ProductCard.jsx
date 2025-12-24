@@ -5,11 +5,17 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, increaseQty, decreaseQty } from "@/redux/slices/cartSlice";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Heart } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { toggleSavedProduct } from "@/redux/slices/userSlice";
 
 export default function ProductCard({ product }) {
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const currentUser = useSelector((state) => state.user.currentUser);
+  const isSaved = currentUser?.savedProducts?.includes(product._id);
 
   const cartItem = useSelector((state) => state.cart.items[product._id]);
 
@@ -34,6 +40,29 @@ export default function ProductCard({ product }) {
   const handleDec = (e) => {
     e.stopPropagation();
     dispatch(decreaseQty(product._id));
+  };
+
+  const handleToggleSave = async (e) => {
+    e.stopPropagation();
+
+    if (!currentUser) {
+      toast.error("Please login to save products");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/saved/${product._id}`,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(toggleSavedProduct(product._id));
+
+      toast.success(isSaved ? "Removed from saved" : "Saved for later ❤️");
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to save product");
+    }
   };
 
   return (
@@ -95,6 +124,26 @@ export default function ProductCard({ product }) {
           </span>
         </div>
       )}
+
+      {/* SAVE ICON */}
+      <div
+        onClick={handleToggleSave}
+        className="
+    absolute top-3 left-3 z-30
+    h-9 w-9 rounded-full
+    bg-black/60 backdrop-blur
+    flex items-center justify-center
+    hover:scale-110 transition
+  "
+      >
+        <Heart
+          size={18}
+          className={`
+      transition
+      ${isSaved ? "fill-pink-500 text-pink-500" : "text-white"}
+    `}
+        />
+      </div>
 
       {/* Image - White Background */}
       <div className="relative w-full h-56 sm:h-64 bg-white flex items-center justify-center overflow-hidden">

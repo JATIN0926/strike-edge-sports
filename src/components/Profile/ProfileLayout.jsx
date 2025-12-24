@@ -3,13 +3,13 @@
 import { useState } from "react";
 import ProfileSidebar from "./ProfileSidebar";
 import ProfileInfo from "./ProfileInfo";
-import ComingSoon from "./ComingSoon";
 import { useSelector } from "react-redux";
 import ManageCategories from "./admin/ManageCategories";
 import AddProduct from "./admin/AddProduct";
 import ProductsList from "./admin/Products_Tab/ProductsList";
 import AdminOrdersReceived from "./admin/AdminOrdersReceived";
 import MyOrders from "./user/Orders/MyOrders";
+import SavedProducts from "./user/SavedProducts";
 
 export default function ProfileLayout() {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -24,8 +24,9 @@ export default function ProfileLayout() {
     if (!isAdmin) {
       if (activeTab === "orders") {
         return <MyOrders />;
-      } else {
-        return <ComingSoon />;
+      }
+      if(activeTab === "saved"){
+        return <SavedProducts />
       }
     }
 
@@ -35,7 +36,6 @@ export default function ProfileLayout() {
       if (activeTab === "add-product") return <AddProduct />;
       if (activeTab === "products") return <ProductsList />;
       if (activeTab === "orders-received") return <AdminOrdersReceived />;
-      return <ComingSoon />;
     }
 
     return null;
