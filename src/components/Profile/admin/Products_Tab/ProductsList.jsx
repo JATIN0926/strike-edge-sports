@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import ProductAdminCard from "./ProductAdminCard";
 import AppLoader from "@/components/Loader/AppLoader";
@@ -72,117 +73,176 @@ export default function ProductsList() {
   /* ========================== UI ========================== */
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-black">Products</h2>
-        <p className="text-sm text-black/60">Manage all listed products</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-6"
+      >
+        <h2 className="text-xl sm:text-2xl font-bold text-black/90">
+          Products
+        </h2>
+        <p className="text-sm text-black/50 mt-1">
+          Manage all listed products
+        </p>
+      </motion.div>
 
       {/* Search */}
-      <input
-        type="text"
-        placeholder="Search by title, grade or product type"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="
-          w-full md:w-1/2
-          rounded-xl border border-black/10
-          px-4 py-2
-          bg-white/70 backdrop-blur
-          focus:outline-none
-          focus:ring-2 focus:ring-indigo-400
-        "
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="mb-6"
+      >
+        <input
+          type="text"
+          placeholder="Search by title, grade or product type"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="
+            w-full sm:w-96
+            rounded-xl px-4 py-2.5
+            border border-black/10
+            bg-white/60 backdrop-blur-md
+            text-sm
+            placeholder:text-black/40
+            focus:outline-none focus:ring-2 focus:ring-indigo-400/50 focus:border-transparent
+            transition-all duration-200
+          "
+        />
+      </motion.div>
 
       {/* Content */}
       {loading ? (
-         <AppLoader text="Loading Products…" />
+        <AppLoader text="Loading Products…" />
       ) : products.length === 0 ? (
-        <div
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
           className="
             flex flex-col items-center justify-center
-            py-20 text-center
+            py-16 sm:py-20 text-center
             rounded-2xl
             border border-black/10
-            bg-white/60 backdrop-blur
+            bg-white/50 backdrop-blur-md
           "
         >
-          <div className="text-4xl mb-3">🔍</div>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            className="text-5xl sm:text-6xl mb-4"
+          >
+            🔍
+          </motion.div>
 
-          <h3 className="text-lg font-semibold text-black">
+          <h3 className="text-lg sm:text-xl font-semibold text-black/90">
             No products found
           </h3>
 
-          <p className="text-sm text-black/60 mt-1 max-w-xs">
+          <p className="text-sm text-black/50 mt-2 max-w-sm px-4">
             Try searching with a different name, grade or product type.
           </p>
 
           {search && (
-            <button
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
               onClick={() => setSearch("")}
               className="
                 cursor-pointer
-                mt-5 px-5 py-2
-                rounded-full
+                mt-6 px-6 py-2.5
+                rounded-xl
                 text-sm font-medium
-                bg-black text-white
-                hover:bg-emerald-600 transition
+                bg-black/90 text-white
+                hover:bg-indigo-600
+                transition-all duration-200
+                shadow-sm hover:shadow-md
               "
             >
               Clear search
-            </button>
+            </motion.button>
           )}
-        </div>
+        </motion.div>
       ) : (
         <>
           {/* Products Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {products.map((product) => (
-              <ProductAdminCard
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6"
+          >
+            {products.map((product, idx) => (
+              <motion.div
                 key={product._id}
-                product={product}
-                onRefresh={() =>
-                  fetchProducts({
-                    pageNumber: page,
-                    searchTerm: search.trim(),
-                  })
-                }
-              />
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.05 }}
+              >
+                <ProductAdminCard
+                  product={product}
+                  onRefresh={() =>
+                    fetchProducts({
+                      pageNumber: page,
+                      searchTerm: search.trim(),
+                    })
+                  }
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-3 pt-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="flex justify-center items-center gap-3 pt-8"
+            >
               <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
                 className="
-                  px-4 py-2 rounded-lg text-sm
-                  bg-black/5 hover:bg-black/10
+                  px-4 py-2 rounded-lg
+                  bg-white/50 backdrop-blur-md
+                  border border-black/10
+                  text-sm font-medium
+                  hover:bg-white/70 hover:border-black/20
                   disabled:opacity-40 disabled:cursor-not-allowed
+                  cursor-pointer
+                  transition-all duration-200
                 "
               >
                 ← Prev
               </button>
 
-              <span className="text-sm text-black/70">
-                Page <strong>{page}</strong> of {totalPages}
+              <span className="text-sm text-black/70 px-2">
+                Page <strong className="text-black/90">{page}</strong> of {totalPages}
               </span>
 
               <button
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page === totalPages}
                 className="
-                  px-4 py-2 rounded-lg text-sm
-                  bg-black/5 hover:bg-black/10
+                  px-4 py-2 rounded-lg
+                  bg-white/50 backdrop-blur-md
+                  border border-black/10
+                  text-sm font-medium
+                  hover:bg-white/70 hover:border-black/20
                   disabled:opacity-40 disabled:cursor-not-allowed
+                  cursor-pointer
+                  transition-all duration-200
                 "
               >
                 Next →
               </button>
-            </div>
+            </motion.div>
           )}
         </>
       )}

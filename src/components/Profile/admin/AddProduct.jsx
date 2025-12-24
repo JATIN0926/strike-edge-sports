@@ -31,7 +31,7 @@ export default function AddProduct() {
   useEffect(() => {
     axios
       .get(`${API}/api/categories`)
-      .then((res) => setCategories(res.data))
+      .then((res) => setCategories(res.data.categories))
       .catch(() => toast.error("Failed to load categories"));
   }, []);
 
