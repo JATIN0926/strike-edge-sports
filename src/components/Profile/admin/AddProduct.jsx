@@ -99,7 +99,6 @@ export default function AddProduct() {
     setImages((prev) => prev.filter((i) => i.publicId !== img.publicId));
 
     try {
-      console.log("till here");
       await axios.delete(`${API}/api/products/cloudinary`, {
         params: { publicId: img.publicId },
         withCredentials: true,

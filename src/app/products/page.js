@@ -3,32 +3,37 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+
 import ProductCard from "@/components/Homepage/BestSellers/ProductCard";
 import Pagination from "@/components/Products/Pagination";
-import ProductsToolbar from "@/components/Products//ProductsToolbar";
-import toast from "react-hot-toast";
+import ProductsToolbar from "@/components/Products/ProductsToolbar";
 import ProductCardSkeleton from "@/components/Products/ProductCardSkeleton";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LIMIT = 6;
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const page = Number(searchParams.get("page")) || 1;
+  const search = searchParams.get("search") || "";
+  const sort = searchParams.get("sort") || "latest";
+  const type = searchParams.get("type") || "all";
+  const category = searchParams.get("category") || "all";
+
+  /* ================= LOCAL STATE ================= */
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
-
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("latest");
-  const [type, setType] = useState("all");
-  const [category, setCategory] = useState("all");
-
   const [loading, setLoading] = useState(true);
 
+  /* ================= FETCH PRODUCTS ================= */
   const fetchProducts = async () => {
     try {
       setLoading(true);
 
-      console.log("till here");
       const res = await axios.get(`${API}/api/products`, {
         params: {
           page,
@@ -38,13 +43,12 @@ export default function ProductsPage() {
           type,
           category,
         },
-        withCredentials: true,
       });
 
       setProducts(res.data.products);
       setTotal(res.data.total);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       toast.error("Failed to load products");
     } finally {
       setLoading(false);
@@ -53,16 +57,47 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchProducts();
-  }, [page, search, sort, type]);
+  }, [page, search, sort, type, category]);
 
-  useEffect(() => {
-    window.scrollTo({ top: 200, behavior: "smooth" });
-  }, [page]);
+  /* ================= URL UPDATE HELPER ================= */
+  const updateQuery = (updates) => {
+    const params = new URLSearchParams(searchParams.toString());
 
-  useEffect(() => {
-    setPage(1);
-  }, [search, sort, type, category]);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value) {
+        params.delete(key);
+      } else if ((key === "type" || key === "category") && value === "all") {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
 
+    // reset page on filter change
+    if (!("page" in updates)) {
+      params.set("page", "1");
+    }
+
+    router.push(`/products?${params.toString()}`);
+  };
+
+  /* ================= HANDLERS ================= */
+  // ✅ Modified to accept both sort and type together
+  const handleSortChange = (nextSort, nextType) => {
+    // ✅ If type is being set to something other than "all", clear category
+    if (nextType !== "all") {
+      updateQuery({ sort: nextSort, type: nextType, category: "all" });
+    } else {
+      updateQuery({ sort: nextSort, type: nextType });
+    }
+  };
+
+  // ✅ Handler to clear all filters and show all categories
+  const handleShowAllCategories = () => {
+    updateQuery({ sort: "latest", type: "all", category: "all" });
+  };
+
+  /* ========================== UI ========================== */
   return (
     <div className="min-h-screen bg-[#f7f8fa] pt-28">
       <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-10">
@@ -84,13 +119,14 @@ export default function ProductsPage() {
         {/* Toolbar */}
         <ProductsToolbar
           search={search}
-          setSearch={setSearch}
+          setSearch={(val) => updateQuery({ search: val })}
           sort={sort}
-          setSort={setSort}
+          setSort={handleSortChange}
           type={type}
-          setType={setType}
+          setType={(val) => updateQuery({ type: val })}
           category={category}
-          setCategory={setCategory}
+          setCategory={(val) => updateQuery({ category: val })}
+          onShowAllCategories={handleShowAllCategories}
           shown={products.length}
           total={total}
         />
@@ -116,7 +152,6 @@ export default function ProductsPage() {
           </motion.div>
         ) : (
           <AnimatePresence mode="wait">
-            {/* 👇 KEY IS VERY IMPORTANT */}
             <motion.div
               key={page}
               initial={{ opacity: 0, y: 20 }}
@@ -146,7 +181,7 @@ export default function ProductsPage() {
         {total > LIMIT && (
           <Pagination
             page={page}
-            setPage={setPage}
+            setPage={(p) => updateQuery({ page: p })}
             total={total}
             limit={LIMIT}
           />
