@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const slides = [
   {
@@ -28,27 +29,35 @@ const slides = [
 
 export default function HeroCarousel() {
   const [index, setIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const nextSlide = () =>
-    setIndex((prev) => (prev + 1) % slides.length);
+  const router = useRouter();
+
+  const nextSlide = () => setIndex((prev) => (prev + 1) % slides.length);
 
   const prevSlide = () =>
     setIndex((prev) => (prev - 1 + slides.length) % slides.length);
 
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    if (!isHovered) {
+      const interval = setInterval(nextSlide, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [isHovered]);
 
   return (
-    <div className="relative w-full h-[70vh] rounded-3xl overflow-hidden group bg-white shadow-xl shadow-black/5">
+    <div
+      className="relative w-full h-[70vh] sm:h-[75vh] md:h-[80vh] rounded-3xl overflow-hidden group bg-white shadow-2xl shadow-black/10"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={slides[index].id}
-          initial={{ opacity: 0, scale: 1.05 }}
+          initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.98 }}
-          transition={{ duration: 0.7, ease: "easeInOut" }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
         >
           {/* Image */}
@@ -60,43 +69,73 @@ export default function HeroCarousel() {
             className="object-cover"
           />
 
-          {/* Soft overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/40 to-transparent" />
+          {/* Enhanced gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
           {/* Content */}
-          <div className="absolute inset-0 flex items-center px-6 md:px-14">
+          <div className="absolute inset-0 flex items-center px-6 sm:px-10 md:px-14">
             <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              initial={{ x: -50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
               className="
-                max-w-lg
-                rounded-3xl
-                bg-white/70 backdrop-blur-xl
-                border border-black/10
-                p-6 md:p-8
-                shadow-xl shadow-black/10
+                max-w-xl
+                rounded-2xl
+                bg-white/80 backdrop-blur-2xl
+                border border-white/20
+                p-6 sm:p-8 md:p-10
+                shadow-2xl
               "
             >
-              <h1 className="text-black text-3xl md:text-4xl font-bold tracking-tight">
+              <motion.h1
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                className="text-black text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-tight"
+              >
                 {slides[index].title}
-              </h1>
+              </motion.h1>
 
-              <p className="text-black/70 mt-2 text-sm md:text-base">
+              <motion.p
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                className="text-black/70 mt-3 text-sm sm:text-base md:text-lg leading-relaxed"
+              >
                 {slides[index].desc}
-              </p>
+              </motion.p>
 
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                onClick={() => router.push("/products")}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+                whileHover={{ scale: 1.05, x: 5 }}
+                whileTap={{ scale: 0.95 }}
                 className="
-                  mt-5 inline-flex items-center
-                  rounded-full
-                  bg-emerald-600 text-white
-                  px-6 py-2.5 text-sm font-medium
-                  hover:bg-emerald-700 transition
+                  cursor-pointer
+                  group/btn
+                  mt-6 inline-flex items-center gap-2
+                  rounded-xl
+                  bg-gradient-to-r from-emerald-500 to-green-600
+                  text-white
+                  px-8 py-3.5 text-sm font-semibold
+                  shadow-lg shadow-emerald-500/30
+                  hover:shadow-xl hover:shadow-emerald-500/40
+                  transition-all duration-300
+                  relative overflow-hidden
                 "
               >
-                Shop Now
+                {/* Shimmer effect */}
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-700" />
+
+                <span className="relative">Shop Now</span>
+                <ArrowRight
+                  size={18}
+                  className="relative group-hover/btn:translate-x-1 transition-transform duration-300"
+                  strokeWidth={2.5}
+                />
               </motion.button>
             </motion.div>
           </div>
@@ -106,52 +145,77 @@ export default function HeroCarousel() {
       {/* Left Arrow */}
       <motion.button
         onClick={prevSlide}
-        whileHover={{ scale: 1.1 }}
+        initial={{ opacity: 0, x: -20 }}
+        whileHover={{ scale: 1.15, x: -2 }}
         whileTap={{ scale: 0.95 }}
         className="
-          absolute left-4 top-1/2 -translate-y-1/2 z-20
-          h-10 w-10 rounded-full
-          bg-white/70 backdrop-blur-xl
-          border border-black/10
+          cursor-pointer
+          absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-20
+          h-12 w-12 rounded-full
+          bg-white/80 backdrop-blur-xl
+          border border-white/20
           text-black
           flex items-center justify-center
-          opacity-0 group-hover:opacity-100 transition
+          opacity-0 group-hover:opacity-100
+          transition-all duration-300
+          shadow-lg hover:shadow-xl
         "
       >
-        <ChevronLeft size={20} />
+        <ChevronLeft size={24} strokeWidth={2.5} />
       </motion.button>
 
       {/* Right Arrow */}
       <motion.button
         onClick={nextSlide}
-        whileHover={{ scale: 1.1 }}
+        initial={{ opacity: 0, x: 20 }}
+        whileHover={{ scale: 1.15, x: 2 }}
         whileTap={{ scale: 0.95 }}
         className="
-          absolute right-4 top-1/2 -translate-y-1/2 z-20
-          h-10 w-10 rounded-full
-          bg-white/70 backdrop-blur-xl
-          border border-black/10
+          cursor-pointer
+          absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-20
+          h-12 w-12 rounded-full
+          bg-white/80 backdrop-blur-xl
+          border border-white/20
           text-black
           flex items-center justify-center
-          opacity-0 group-hover:opacity-100 transition
+          opacity-0 group-hover:opacity-100
+          transition-all duration-300
+          shadow-lg hover:shadow-xl
         "
       >
-        <ChevronRight size={20} />
+        <ChevronRight size={24} strokeWidth={2.5} />
       </motion.button>
 
-      {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+      {/* Enhanced Dots */}
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
         {slides.map((_, i) => (
-          <button
+          <motion.button
             key={i}
             onClick={() => setIndex(i)}
-            className={`h-2 rounded-full transition-all ${
-              index === i
-                ? "bg-emerald-600 w-6"
-                : "bg-black/30 w-2"
-            }`}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+            className={`
+              cursor-pointer
+              h-2.5 rounded-full transition-all duration-300
+              ${
+                index === i
+                  ? "bg-emerald-500 w-8 shadow-lg shadow-emerald-500/50"
+                  : "bg-white/60 w-2.5 hover:bg-white/80"
+              }
+            `}
           />
         ))}
+      </div>
+
+      {/* Progress Bar */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-20">
+        <motion.div
+          key={index}
+          initial={{ width: "0%" }}
+          animate={{ width: isHovered ? "0%" : "100%" }}
+          transition={{ duration: 5, ease: "linear" }}
+          className="h-full bg-gradient-to-r from-emerald-500 to-green-600"
+        />
       </div>
     </div>
   );

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import { UploadCloud, X, Trash2 } from "lucide-react";
+import { UploadCloud, X, Trash2, Plus, Edit3 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ProductDescriptionEditor from "../Profile/admin/ProductDescriptionEditor";
 
@@ -13,6 +14,7 @@ const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 export default function EditProduct({ productId }) {
   const router = useRouter();
+  const fileInputRef = useRef();
 
   const [categories, setCategories] = useState([]);
   const [images, setImages] = useState([]);
@@ -34,7 +36,7 @@ export default function EditProduct({ productId }) {
   useEffect(() => {
     axios
       .get(`${API}/api/categories`)
-      .then((res) => setCategories(res.data))
+      .then((res) => setCategories(res.data.categories))
       .catch(() => toast.error("Failed to load categories"));
   }, []);
 
@@ -42,11 +44,12 @@ export default function EditProduct({ productId }) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`${API}/api/products/edit/${productId}`, {
+        const res = await axios.get(`${API}/api/products/${productId}`, {
           withCredentials: true,
         });
 
         const p = res.data;
+        console.log("data", p);
 
         setForm({
           title: p.title || "",
@@ -60,7 +63,8 @@ export default function EditProduct({ productId }) {
         });
 
         setImages(p.images || []);
-      } catch {
+      } catch (err) {
+        console.log(err);
         toast.error("Failed to load product");
         router.push("/profile");
       } finally {
@@ -104,6 +108,9 @@ export default function EditProduct({ productId }) {
       toast.error("Image upload failed", { id: "upload" });
     } finally {
       setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -125,6 +132,7 @@ export default function EditProduct({ productId }) {
     const updated = [...form.attributes];
     updated.splice(i, 1);
     setForm({ ...form, attributes: updated });
+    toast.success("Attribute removed");
   };
 
   /* ---------------- Remove Image ---------------- */
@@ -140,6 +148,10 @@ export default function EditProduct({ productId }) {
       toast.success("Image removed");
     } catch {
       toast.error("Failed to remove image from Cloudinary");
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -177,50 +189,82 @@ export default function EditProduct({ productId }) {
   };
 
   if (loadingProduct) {
-    return <p className="text-sm text-black/60">Loading product…</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-sm text-black/60">Loading product…</p>
+      </div>
+    );
   }
 
   /* ========================== UI ========================== */
 
   return (
-    <div className="w-full flex items-center justify-center mt-24">
-      <div className="max-w-3xl space-y-8">
-        {/* Header */}
-        <div className="space-y-1.5">
-          <h2 className="text-2xl font-bold text-black flex items-center gap-2">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 mt-20">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-8"
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2 rounded-xl bg-indigo-100">
+            <Edit3 className="text-indigo-600" size={24} strokeWidth={2.5} />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-black/90">
             Edit Product
-            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
-              Admin
-            </span>
           </h2>
-
-          <p className="text-sm text-black/60">
-            Modify product details, images and attributes.
-          </p>
         </div>
+        <p className="text-sm text-black/50">
+          Modify product details, images and attributes.
+        </p>
+      </motion.div>
 
+      <div className="space-y-6">
         {/* Product Title */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Product Title
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10"
+        >
+          <label className="block text-sm font-semibold mb-2 text-black/80">
+            Product Title *
           </label>
           <input
-            className="w-full rounded-xl border border-black/10 px-4 py-2
-          bg-white/70 backdrop-blur focus:outline-none focus:ring-2
-          focus:ring-emerald-400"
+            className="
+              w-full rounded-xl border border-black/10 px-4 py-2.5
+              bg-white/70 backdrop-blur-sm
+              text-sm
+              placeholder:text-black/40
+              focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-transparent
+              transition-all duration-200
+            "
+            placeholder="e.g., English Willow – Elite"
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
           />
-        </div>
+        </motion.div>
 
         {/* Type & Category */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Product Type
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          <div className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10">
+            <label className="block text-sm font-semibold mb-2 text-black/80">
+              Product Type *
             </label>
             <select
-              className="w-full rounded-xl border border-black/10 px-4 py-2 bg-white/70"
+              className="
+                w-full rounded-xl border border-black/10 px-4 py-2.5
+                bg-white/70 backdrop-blur-sm text-sm
+                cursor-pointer
+                focus:outline-none focus:ring-2 focus:ring-emerald-400/50
+                transition-all duration-200
+              "
               value={form.productType}
               onChange={(e) =>
                 setForm({ ...form, productType: e.target.value })
@@ -233,10 +277,18 @@ export default function EditProduct({ productId }) {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Category</label>
+          <div className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10">
+            <label className="block text-sm font-semibold mb-2 text-black/80">
+              Category *
+            </label>
             <select
-              className="w-full rounded-xl border border-black/10 px-4 py-2 bg-white/70"
+              className="
+                w-full rounded-xl border border-black/10 px-4 py-2.5
+                bg-white/70 backdrop-blur-sm text-sm
+                cursor-pointer
+                focus:outline-none focus:ring-2 focus:ring-emerald-400/50
+                transition-all duration-200
+              "
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
             >
@@ -248,140 +300,295 @@ export default function EditProduct({ productId }) {
               ))}
             </select>
           </div>
-        </div>
+        </motion.div>
 
         {/* Grade & Price */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <input
-            placeholder="Grade"
-            className="rounded-xl border px-4 py-2"
-            value={form.grade}
-            onChange={(e) => setForm({ ...form, grade: e.target.value })}
-          />
-          <input
-            type="number"
-            placeholder="Price"
-            className="rounded-xl border px-4 py-2"
-            value={form.price}
-            onChange={(e) => setForm({ ...form, price: e.target.value })}
-          />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          <div className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10">
+            <label className="block text-sm font-semibold mb-2 text-black/80">
+              Grade *
+            </label>
+            <input
+              className="
+                w-full rounded-xl border border-black/10 px-4 py-2.5
+                bg-white/70 backdrop-blur-sm text-sm
+                placeholder:text-black/40
+                focus:outline-none focus:ring-2 focus:ring-emerald-400/50
+                transition-all duration-200
+              "
+              placeholder="e.g., Elite / Grade A+"
+              value={form.grade}
+              onChange={(e) => setForm({ ...form, grade: e.target.value })}
+            />
+          </div>
+
+          <div className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10">
+            <label className="block text-sm font-semibold mb-2 text-black/80">
+              Price (₹) *
+            </label>
+            <input
+              type="number"
+              className="
+                w-full rounded-xl border border-black/10 px-4 py-2.5
+                bg-white/70 backdrop-blur-sm text-sm
+                focus:outline-none focus:ring-2 focus:ring-emerald-400/50
+                transition-all duration-200
+              "
+              placeholder="Enter price"
+              value={form.price}
+              onChange={(e) => setForm({ ...form, price: e.target.value })}
+            />
+          </div>
+        </motion.div>
 
         {/* Stock */}
-        <input
-          type="number"
-          placeholder="Stock"
-          className="rounded-xl border px-4 py-2"
-          value={form.stock}
-          onChange={(e) => setForm({ ...form, stock: e.target.value })}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.25 }}
+          className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10"
+        >
+          <label className="block text-sm font-semibold mb-2 text-black/80">
+            Stock Quantity
+          </label>
+          <input
+            type="number"
+            className="
+              w-full rounded-xl border border-black/10 px-4 py-2.5
+              bg-white/70 backdrop-blur-sm text-sm
+              focus:outline-none focus:ring-2 focus:ring-emerald-400/50
+              transition-all duration-200
+            "
+            placeholder="Enter available stock"
+            value={form.stock}
+            onChange={(e) => setForm({ ...form, stock: e.target.value })}
+          />
+        </motion.div>
 
         {/* Description */}
-        <ProductDescriptionEditor
-          value={form.description}
-          onChange={(html) => setForm({ ...form, description: html })}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10"
+        >
+          <label className="block text-sm font-semibold mb-2 text-black/80">
+            Description
+          </label>
+          <ProductDescriptionEditor
+            value={form.description}
+            onChange={(html) => setForm({ ...form, description: html })}
+          />
+        </motion.div>
 
         {/* Attributes */}
-        {form.attributes.map((attr, i) => (
-          <div key={i} className="flex gap-3">
-            <input
-              className="w-1/2 border rounded px-3 py-2"
-              value={attr.key}
-              onChange={(e) => updateAttribute(i, "key", e.target.value)}
-            />
-            <input
-              className="w-1/2 border rounded px-3 py-2"
-              value={attr.value}
-              onChange={(e) => updateAttribute(i, "value", e.target.value)}
-            />
-            <button onClick={() => removeAttribute(i)}>
-              <Trash2 size={16} />
-            </button>
-          </div>
-        ))}
-        <button onClick={addAttribute} className="text-emerald-600">
-          + Add attribute
-        </button>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.35 }}
+          className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10"
+        >
+          <label className="block text-sm font-semibold mb-3 text-black/80">
+            Product Attributes
+          </label>
+          
+          <AnimatePresence>
+            {form.attributes.map((attr, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="flex gap-2 mb-3"
+              >
+                <input
+                  placeholder="Key (e.g., Weight)"
+                  className="
+                    flex-1 rounded-lg border border-black/10 px-3 py-2
+                    bg-white/70 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-emerald-400/50
+                    transition-all duration-200
+                  "
+                  value={attr.key}
+                  onChange={(e) =>
+                    updateAttribute(i, "key", e.target.value)
+                  }
+                />
+                <input
+                  placeholder="Value (e.g., 1.2 kg)"
+                  className="
+                    flex-1 rounded-lg border border-black/10 px-3 py-2
+                    bg-white/70 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-emerald-400/50
+                    transition-all duration-200
+                  "
+                  value={attr.value}
+                  onChange={(e) =>
+                    updateAttribute(i, "value", e.target.value)
+                  }
+                />
+                <button
+                  onClick={() => removeAttribute(i)}
+                  className="
+                    cursor-pointer
+                    p-2 rounded-lg
+                    bg-red-500 text-white
+                    hover:bg-red-600
+                    transition-all duration-200
+                  "
+                >
+                  <Trash2 size={18} strokeWidth={2.5} />
+                </button>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          <button
+            onClick={addAttribute}
+            className="
+              cursor-pointer
+              flex items-center gap-1.5
+              text-sm font-medium
+              text-emerald-600
+              hover:text-emerald-700
+              transition-colors
+            "
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            Add attribute
+          </button>
+        </motion.div>
 
         {/* Image Upload */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Product Images
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+          className="p-5 rounded-2xl bg-white/50 backdrop-blur-xl border border-black/10"
+        >
+          <label className="block text-sm font-semibold mb-3 text-black/80">
+            Product Images *
           </label>
 
           <label
             className="
-      flex flex-col items-center justify-center
-      border-2 border-dashed border-black/20
-      rounded-2xl p-6 cursor-pointer
-      bg-white/60 backdrop-blur
-      hover:border-emerald-500 transition
-    "
+              flex flex-col items-center justify-center
+              border-2 border-dashed border-black/20
+              rounded-2xl p-8 cursor-pointer
+              bg-white/60 backdrop-blur-sm
+              hover:border-emerald-500 hover:bg-emerald-50/30
+              transition-all duration-300
+              group
+            "
           >
-            <UploadCloud className="w-8 h-8 text-black/50 mb-2" />
-            <span className="text-sm text-black/70">
+            <UploadCloud
+              className="w-10 h-10 text-black/40 group-hover:text-emerald-600 mb-3 transition-colors"
+              strokeWidth={2}
+            />
+            <span className="text-sm font-medium text-black/70 group-hover:text-emerald-600 transition-colors">
               Click to upload multiple images
             </span>
-
+            <span className="text-xs text-black/40 mt-1">
+              PNG, JPG up to 10MB
+            </span>
             <input
+              ref={fileInputRef}
               type="file"
               multiple
+              accept="image/*"
               hidden
               onChange={(e) => handleImageUpload(e.target.files)}
             />
           </label>
 
           {uploading && (
-            <p className="text-sm text-black/60 mt-2">Uploading images…</p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm text-emerald-600 mt-3 font-medium"
+            >
+              Uploading images…
+            </motion.p>
           )}
 
-          <div className="flex gap-3 flex-wrap mt-4">
-            {images.map((img) => (
-              <div key={img.publicId} className="relative group">
-                <img
-                  src={img.url}
-                  className="
-            w-24 h-24 rounded-xl object-cover
-            transition-transform group-hover:scale-105
-          "
-                />
-                <button
-                  onClick={() => removeImage(img)}
-                  className="
-            cursor-pointer
-            absolute -top-2 -right-2
-            bg-black text-white rounded-full p-1
-            hover:scale-110 transition
-          "
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+          <AnimatePresence>
+            {images.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex gap-3 flex-wrap mt-4"
+              >
+                {images.map((img, idx) => (
+                  <motion.div
+                    key={img.publicId}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="relative group"
+                  >
+                    <img
+                      src={img.url}
+                      alt="Product"
+                      className="
+                        w-24 h-24 rounded-xl object-cover
+                        border border-black/10
+                        group-hover:scale-105 transition-transform duration-200
+                      "
+                    />
+                    <button
+                      onClick={() => removeImage(img)}
+                      className="
+                        cursor-pointer
+                        absolute -top-2 -right-2
+                        bg-red-500 text-white rounded-full p-1.5
+                        opacity-0 group-hover:opacity-100
+                        hover:bg-red-600 hover:scale-110
+                        transition-all duration-200
+                        shadow-lg
+                      "
+                    >
+                      <X size={14} strokeWidth={3} />
+                    </button>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
-        {/* Save */}
-        <div className="pt-6">
+        {/* Update Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.45 }}
+          className="pt-4"
+        >
           <button
             onClick={handleUpdateProduct}
             disabled={uploading}
             className={`
-      cursor-pointer
-      w-full md:w-auto
-      px-10 py-3 rounded-full
-      font-medium transition
-      ${
-        uploading
-          ? "bg-black/50 text-white cursor-not-allowed"
-          : "bg-black text-white hover:bg-emerald-600"
-      }
-    `}
+              cursor-pointer
+              w-full sm:w-auto
+              px-10 py-3.5 rounded-xl
+              font-semibold text-sm
+              transition-all duration-300
+              ${
+                uploading
+                  ? "bg-black/50 text-white cursor-not-allowed"
+                  : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:scale-105"
+              }
+            `}
           >
-            {uploading ? "Uploading…" : "Update Product"}
+            {uploading ? "Uploading Images..." : "Update Product"}
           </button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

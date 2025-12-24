@@ -7,6 +7,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import ProductCard from "../BestSellers/ProductCard";
 import ProductCardSkeleton from "@/components/Products/ProductCardSkeleton";
+import { ArrowRight } from "lucide-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -120,16 +121,16 @@ export default function BallsSection() {
         >
           {loading
             ? Array.from({ length: 3 }).map((_, i) => (
-              <motion.div
-                key={`skeleton-${i}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <ProductCardSkeleton />
-              </motion.div>
-            ))
+                <motion.div
+                  key={`skeleton-${i}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <ProductCardSkeleton />
+                </motion.div>
+              ))
             : products.map((product, index) => (
                 <motion.div
                   key={product._id}
@@ -140,30 +141,52 @@ export default function BallsSection() {
                   className="relative"
                 >
                   <ProductCard product={product} />
-
-                  {/* Explore Button */}
-                  <div className="mt-4 flex justify-center">
-                    <Link
-                      href={`/products?category=${BALL_TYPES[activeType].slug}&type=ball`}
-                    >
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="
-                          text-sm font-medium
-                          text-black border-b border-black/30
-                          hover:border-black
-                          transition
-                        "
-                      >
-                        Explore →
-                      </motion.button>
-                    </Link>
-                  </div>
                 </motion.div>
               ))}
         </motion.div>
       </AnimatePresence>
+
+      {!loading && products.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-12 flex justify-center"
+        >
+          <Link
+            href={`/products?category=${BALL_TYPES[activeType].slug}&type=ball`}
+          >
+            <motion.button
+              whileHover={{ scale: 1.05, x: 5 }}
+              whileTap={{ scale: 0.95 }}
+              className="
+                group
+                cursor-pointer
+                flex items-center gap-2
+                px-8 py-3.5
+                rounded-xl
+                bg-gradient-to-r from-emerald-500 to-green-600
+                text-white text-sm font-semibold
+                shadow-lg shadow-emerald-500/30
+                hover:shadow-xl hover:shadow-emerald-500/40
+                transition-all duration-300
+                relative
+                overflow-hidden
+              "
+            >
+              {/* Background shimmer effect */}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
+
+              <span className="relative">Explore</span>
+              <ArrowRight
+                size={18}
+                className="relative group-hover:translate-x-1 transition-transform duration-300"
+                strokeWidth={2.5}
+              />
+            </motion.button>
+          </Link>
+        </motion.div>
+      )}
     </section>
   );
 }

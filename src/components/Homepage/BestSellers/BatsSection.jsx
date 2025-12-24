@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import ProductCard from "../BestSellers/ProductCard";
 import ProductCardSkeleton from "@/components/Products/ProductCardSkeleton";
 
@@ -133,20 +134,47 @@ export default function BatsSection() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Explore */}
+      {/* Explore Button */}
       {!loading && products.length > 0 && (
-        <div className="mt-10 flex justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-12 flex justify-center"
+        >
           <Link
             href={`/products?category=${products[0].category.slug}&type=bat`}
           >
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              className="text-sm font-medium text-black border-b border-black/30 hover:border-black transition"
+              whileHover={{ scale: 1.05, x: 5 }}
+              whileTap={{ scale: 0.95 }}
+              className="
+                group
+                cursor-pointer
+                flex items-center gap-2
+                px-8 py-3.5
+                rounded-xl
+                bg-gradient-to-r from-emerald-500 to-green-600
+                text-white text-sm font-semibold
+                shadow-lg shadow-emerald-500/30
+                hover:shadow-xl hover:shadow-emerald-500/40
+                transition-all duration-300
+                relative
+                overflow-hidden
+              "
             >
-              Explore →
+              {/* Background shimmer effect */}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
+              
+              <span className="relative">Explore</span>
+              <ArrowRight 
+                size={18} 
+                className="relative group-hover:translate-x-1 transition-transform duration-300" 
+                strokeWidth={2.5}
+              />
             </motion.button>
           </Link>
-        </div>
+        </motion.div>
       )}
     </section>
   );

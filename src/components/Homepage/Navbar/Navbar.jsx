@@ -243,7 +243,7 @@ export default function Navbar() {
                   transition={{ duration: 0.15 }}
                   className={`
                   absolute right-0 mt-3 w-40 rounded-xl overflow-hidden
-                  bg-white/80 backdrop-blur-xl
+                  bg-white/90 backdrop-blur-xl
                   border border-black/10
                   shadow-xl shadow-black/10
                   ${

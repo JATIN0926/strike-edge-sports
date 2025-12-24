@@ -5,6 +5,7 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Package } from "lucide-react";
 
 import ProductCard from "@/components/Homepage/BestSellers/ProductCard";
 import Pagination from "@/components/Products/Pagination";
@@ -82,9 +83,7 @@ export default function ProductsPage() {
   };
 
   /* ================= HANDLERS ================= */
-  // ✅ Modified to accept both sort and type together
   const handleSortChange = (nextSort, nextType) => {
-    // ✅ If type is being set to something other than "all", clear category
     if (nextType !== "all") {
       updateQuery({ sort: nextSort, type: nextType, category: "all" });
     } else {
@@ -92,99 +91,144 @@ export default function ProductsPage() {
     }
   };
 
-  // ✅ Handler to clear all filters and show all categories
   const handleShowAllCategories = () => {
     updateQuery({ sort: "latest", type: "all", category: "all" });
   };
 
   /* ========================== UI ========================== */
   return (
-    <div className="min-h-screen bg-[#f7f8fa] pt-28">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-10">
+    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white pt-24 sm:pt-28 pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="text-center"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-8 sm:mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-black">
-            Shop Premium Cricket Gear 🏏
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30">
+              <Package className="text-white" size={28} strokeWidth={2.5} />
+            </div>
+          </div>
+          
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black/90 mb-3">
+            Shop Premium Cricket Gear
           </h1>
-          <p className="text-black/60 mt-3 max-w-xl mx-auto">
-            Explore bats, balls, gloves & more — crafted for every level.
+          
+          <p className="text-sm sm:text-base text-black/60 max-w-2xl mx-auto leading-relaxed">
+            Explore bats, balls, gloves & more — crafted for every level of play
           </p>
         </motion.div>
 
         {/* Toolbar */}
-        <ProductsToolbar
-          search={search}
-          setSearch={(val) => updateQuery({ search: val })}
-          sort={sort}
-          setSort={handleSortChange}
-          type={type}
-          setType={(val) => updateQuery({ type: val })}
-          category={category}
-          setCategory={(val) => updateQuery({ category: val })}
-          onShowAllCategories={handleShowAllCategories}
-          shown={products.length}
-          total={total}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <ProductsToolbar
+            search={search}
+            setSearch={(val) => updateQuery({ search: val })}
+            sort={sort}
+            setSort={handleSortChange}
+            type={type}
+            setType={(val) => updateQuery({ type: val })}
+            category={category}
+            setCategory={(val) => updateQuery({ category: val })}
+            onShowAllCategories={handleShowAllCategories}
+            shown={products.length}
+            total={total}
+          />
+        </motion.div>
 
         {/* Products */}
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: LIMIT }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : products.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="py-24 text-center rounded-2xl bg-white/60 backdrop-blur border"
-          >
-            <div className="text-4xl mb-3">😕</div>
-            <h3 className="text-lg font-semibold">No products found</h3>
-            <p className="text-sm text-black/60 mt-1">
-              Try changing filters or search keywords
-            </p>
-          </motion.div>
-        ) : (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={page}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {products.map((product, index) => (
+        <div className="mt-8 sm:mt-10">
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: LIMIT }).map((_, i) => (
                 <motion.div
-                  key={product._id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: index * 0.04,
-                  }}
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
                 >
-                  <ProductCard product={product} />
+                  <ProductCardSkeleton />
                 </motion.div>
               ))}
+            </div>
+          ) : products.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="
+                py-20 sm:py-24 text-center 
+                rounded-2xl 
+                bg-white/50 backdrop-blur-md 
+                border border-black/10
+                shadow-sm
+              "
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="text-5xl sm:text-6xl mb-4"
+              >
+                😕
+              </motion.div>
+              <h3 className="text-lg sm:text-xl font-semibold text-black/90">
+                No products found
+              </h3>
+              <p className="text-sm text-black/50 mt-2 max-w-sm mx-auto px-4">
+                Try changing filters or search keywords
+              </p>
             </motion.div>
-          </AnimatePresence>
-        )}
+          ) : (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={page}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {products.map((product, index) => (
+                  <motion.div
+                    key={product._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.4,
+                      delay: index * 0.06,
+                      ease: "easeOut",
+                    }}
+                  >
+                    <ProductCard product={product} />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          )}
+        </div>
 
         {/* Pagination */}
         {total > LIMIT && (
-          <Pagination
-            page={page}
-            setPage={(p) => updateQuery({ page: p })}
-            total={total}
-            limit={LIMIT}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="mt-12"
+          >
+            <Pagination
+              page={page}
+              setPage={(p) => updateQuery({ page: p })}
+              total={total}
+              limit={LIMIT}
+            />
+          </motion.div>
         )}
       </div>
     </div>

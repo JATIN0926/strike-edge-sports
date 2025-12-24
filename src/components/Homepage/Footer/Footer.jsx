@@ -1,7 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Phone, MapPin, MessageCircle } from "lucide-react";
+import {
+  Phone,
+  MapPin,
+  MessageCircle,
+  Mail,
+  Instagram,
+  Facebook,
+} from "lucide-react";
 import GoToTop from "./GoToTop";
 
 export default function Footer() {
@@ -9,73 +16,146 @@ export default function Footer() {
     <>
       <footer
         id="contact"
-        className="mt-24 bg-slate-50 border-t border-black/10"
+        className="mt-24 bg-gradient-to-b from-white to-slate-50/50 border-t border-black/10"
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           {/* Top section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {/* Left - Brand */}
-            <div>
-              <h2 className="text-black text-2xl font-bold tracking-wide">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+              className="text-center md:text-left"
+            >
+              <h2 className="text-black text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
                 StrikeEdgeSports
               </h2>
-              <p className="text-black/60 mt-2 text-sm max-w-xs">
-                Premium cricket gear for every level of player.
+              <p className="text-black/60 mt-3 text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
+                Premium cricket gear for every level of player. Quality
+                equipment that elevates your game.
               </p>
-            </div>
 
-            {/* Middle - Contact */}
-            <div className="flex flex-col items-start gap-3">
-              <h3 className="text-black font-semibold">Contact Us</h3>
-
-              <div className="flex items-center gap-2 text-black/70 text-sm">
+              {/* Social Links */}
+              <div className="flex items-center gap-3 mt-5 justify-center md:justify-start">
                 <motion.a
-                  whileHover={{ x: 2 }}
-                  href="tel:+918923765865"
-                  className="flex items-center gap-2 text-black/70 text-sm hover:text-black transition"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  href="https://www.instagram.com/strikedgesports?igsh=MTE3aW5iZjd3cWU3Yw=="
+                  target="_blank"
+                  className="p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
+                  aria-label="Instagram"
                 >
-                  <Phone size={16} />
-                  Call Us
+                  <Instagram size={18} strokeWidth={2} />
+                </motion.a>
+                <motion.a
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  href="https://www.facebook.com/share/14RWgPADDEk/"
+                  target="_blank"
+                  className="p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
+                  aria-label="Facebook"
+                >
+                  <Facebook size={18} strokeWidth={2} />
+                </motion.a>
+                <motion.a
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  href="mailto:strikedgesports10@gmail.com"
+                  className="p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
+                  aria-label="Email"
+                >
+                  <Mail size={18} strokeWidth={2} />
                 </motion.a>
               </div>
+            </motion.div>
+
+            {/* Middle - Contact */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="flex flex-col items-center md:items-start gap-4"
+            >
+              <h3 className="text-black font-bold text-base">Get In Touch</h3>
 
               <motion.a
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ x: 3 }}
+                href="tel:+918923765865"
+                className="flex items-center gap-2.5 text-black/70 text-sm hover:text-emerald-600 transition-colors group"
+              >
+                <div className="p-2 rounded-lg bg-emerald-50 group-hover:bg-emerald-100 transition-colors">
+                  <Phone size={16} strokeWidth={2.5} />
+                </div>
+                <span className="font-medium">Call Us</span>
+              </motion.a>
+
+              <motion.a
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
                 href="https://wa.me/918923765865"
                 target="_blank"
                 className="
-                  mt-2 inline-flex items-center gap-2
-                  px-4 py-2 rounded-full
-                  bg-emerald-600 text-white
-                  text-sm font-medium
-                  hover:bg-emerald-700 transition
+                  cursor-pointer
+                  inline-flex items-center gap-2.5
+                  px-5 py-2.5 rounded-xl
+                  bg-gradient-to-r from-emerald-500 to-green-600
+                  text-white
+                  text-sm font-semibold
+                  shadow-lg shadow-emerald-500/25
+                  hover:shadow-xl hover:shadow-emerald-500/35
+                  transition-all duration-300
                 "
               >
-                <MessageCircle size={18} />
+                <MessageCircle size={18} strokeWidth={2.5} />
                 WhatsApp Us
               </motion.a>
-            </div>
+            </motion.div>
 
             {/* Right - Address */}
-            <div>
-              <h3 className="text-black font-semibold">Address</h3>
-              <div className="flex items-start gap-2 text-black/60 text-sm mt-2">
-                <MapPin size={16} className="mt-1" />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="text-center md:text-left"
+            >
+              <h3 className="text-black font-bold text-base mb-4">Visit Us</h3>
+              <div className="flex items-start gap-3 text-black/60 text-sm leading-relaxed">
+                <div className="p-2 rounded-lg bg-emerald-50 mt-0.5">
+                  <MapPin
+                    size={16}
+                    strokeWidth={2.5}
+                    className="text-emerald-600"
+                  />
+                </div>
                 <p className="max-w-xs">
-                  Gali no 1, sector 1 , hari nagar, shardhapuri, kankarkhera,
-                  Meerut,Uttar Pradesh , India
+                  Gali no 1, Sector 1, Hari Nagar, Shardhapuri, Kankarkhera,
+                  Meerut, Uttar Pradesh, India
                 </p>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Divider */}
-          <div className="my-10 h-px bg-black/10" />
+          <div className="my-10 h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
 
           {/* Bottom */}
-          <div className="text-center text-black/50 text-sm">
-            © {new Date().getFullYear()} StrikeEdgeSports. All rights reserved.
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="text-center text-black/50 text-sm"
+          >
+            <p>
+              © {new Date().getFullYear()} StrikeEdgeSports. All rights
+              reserved.
+            </p>
+            <p className="mt-1 text-xs">Made with ❤️ for cricket lovers</p>
+          </motion.div>
         </div>
       </footer>
 
