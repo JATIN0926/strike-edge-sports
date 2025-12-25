@@ -132,6 +132,11 @@ export default function ProfileInfo() {
     }
   };
 
+  const handleCloseAddressModal = () => {
+    setOpenAddressModal(false);
+    setAddressToEdit(null);
+  }
+
   if (!currentUser) {
     return <AppLoader text="Loading profile details…" />;
   }
@@ -326,8 +331,11 @@ export default function ProfileInfo() {
 
       <AddAddressModal
         open={openAddressModal}
-        onClose={() => setOpenAddressModal(false)}
-        onAddressAdded={fetchLatestUser}
+        onClose={handleCloseAddressModal}
+        onAddressAdded={() => {
+          fetchLatestUser();
+          setAddressToEdit(null);
+        }}
         mode={addressToEdit ? "edit" : "add"}
         initialData={addressToEdit}
       />

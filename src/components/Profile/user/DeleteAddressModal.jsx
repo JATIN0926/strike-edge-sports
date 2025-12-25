@@ -1,15 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Trash2, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-export default function DeleteAddressModal({
-  open,
-  onClose,
-  onConfirm,
-}) {
+export default function DeleteAddressModal({ open, onClose, onConfirm }) {
   const [mounted, setMounted] = useState(false);
 
   /* ---------- mount for portal (SSR safe) ---------- */
@@ -40,75 +36,150 @@ export default function DeleteAddressModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-[101] bg-black/50 backdrop-blur-md"
+            className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm"
           />
 
           {/* Center wrapper */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed inset-0 z-[102] flex items-center justify-center px-4"
-          >
-            {/* Modal box */}
-            <div
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
               onClick={(e) => e.stopPropagation()}
               className="
-                relative w-full max-w-sm
-                rounded-2xl
-                bg-white/80 backdrop-blur-xl
-                border border-black/10
-                p-6
-                shadow-[0_20px_50px_rgba(0,0,0,0.15)]
+                w-full max-w-md pointer-events-auto
+                bg-white/90 backdrop-blur-xl
+                rounded-3xl
+                shadow-2xl shadow-red-500/10
+                border border-white/50
+                overflow-hidden
               "
             >
-              {/* Close */}
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 text-black/50 hover:text-black cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-
-              <h3 className="text-lg font-semibold text-black">
-                Delete Address?
-              </h3>
-
-              <p className="mt-2 text-sm text-black/60">
-                Are you sure you want to delete this address?  
-                This action cannot be undone.
-              </p>
-
-              <div className="mt-6 flex justify-end gap-3">
-                <button
+              {/* Header with gradient */}
+              <div className="relative bg-gradient-to-br from-red-50 to-orange-50 p-6 pb-8">
+                {/* Close button */}
+                <motion.button
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={onClose}
                   className="
-                    px-4 py-2 rounded-full
-                    border border-black/15
-                    text-sm text-black
-                    hover:bg-black/5 transition
                     cursor-pointer
+                    absolute top-4 right-4
+                    w-8 h-8 rounded-full
+                    bg-white/80 backdrop-blur
+                    border border-black/5
+                    flex items-center justify-center
+                    text-black/60 hover:text-black
+                    transition-colors
                   "
                 >
-                  Cancel
-                </button>
+                  <X size={18} strokeWidth={2.5} />
+                </motion.button>
 
-                <button
-                  onClick={onConfirm}
+                {/* Icon */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring" }}
                   className="
-                    px-5 py-2 rounded-full
-                    bg-red-500 text-white
-                    text-sm font-medium
-                    hover:bg-red-600 transition
-                    cursor-pointer
+                    w-16 h-16 mx-auto mb-4
+                    rounded-2xl
+                    bg-gradient-to-br from-red-500 to-orange-500
+                    flex items-center justify-center
+                    shadow-lg shadow-red-500/30
                   "
                 >
-                  Delete
-                </button>
+                  <Trash2 className="text-white" size={32} strokeWidth={2.5} />
+                </motion.div>
+
+                {/* Title */}
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-2xl font-bold text-center text-black"
+                >
+                  Delete Address
+                </motion.h3>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35 }}
+                  className="text-sm text-center text-black/60 mt-2"
+                >
+                  This action cannot be undone
+                </motion.p>
               </div>
-            </div>
-          </motion.div>
+
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                {/* Warning message */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="
+                    flex items-start gap-3 p-4 rounded-xl
+                    bg-amber-50/80 backdrop-blur
+                    border border-amber-200/50
+                  "
+                >
+                  <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <AlertTriangle className="text-amber-600" size={16} strokeWidth={2.5} />
+                  </div>
+                  <p className="text-sm text-amber-700 leading-relaxed">
+                    Are you sure you want to delete this address? Once deleted, you'll need to add it again if required.
+                  </p>
+                </motion.div>
+
+                {/* Action Buttons */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 }}
+                  className="flex gap-3 pt-2"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onClose}
+                    className="
+                      cursor-pointer
+                      flex-1 px-5 py-3 rounded-xl
+                      bg-white/70 backdrop-blur
+                      border border-black/10
+                      text-black font-semibold text-sm
+                      hover:bg-white hover:border-black/20
+                      transition-all duration-200
+                    "
+                  >
+                    Cancel
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onConfirm}
+                    className="
+                      cursor-pointer
+                      flex-1 px-5 py-3 rounded-xl
+                      bg-gradient-to-r from-red-600 to-orange-600
+                      text-white font-semibold text-sm
+                      shadow-lg shadow-red-500/30
+                      hover:shadow-xl hover:shadow-red-500/40
+                      transition-all duration-200
+                      flex items-center justify-center gap-2
+                    "
+                  >
+                    <Trash2 size={16} strokeWidth={2.5} />
+                    <span>Delete</span>
+                  </motion.button>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>,

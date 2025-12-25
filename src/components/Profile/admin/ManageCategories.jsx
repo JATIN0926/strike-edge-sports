@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { Pencil, Trash2, Check, X, AlertTriangle } from "lucide-react";
 
@@ -15,6 +16,23 @@ export default function ManageCategories() {
   const [editName, setEditName] = useState("");
   const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: "" });
   const [deleting, setDeleting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  /* ---------- mount for portal (SSR safe) ---------- */
+  useEffect(() => {
+    setTimeout(() => setMounted(true), 0);
+    return () => setMounted(false);
+  }, []);
+
+  /* ---------- lock body scroll ---------- */
+  useEffect(() => {
+    if (deleteModal.open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [deleteModal.open]);
 
   const fetchCategories = async () => {
     const res = await axios.get(API, { withCredentials: true });
@@ -78,6 +96,210 @@ export default function ManageCategories() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Delete Modal Component
+  const DeleteCategoryModal = () => {
+    if (!mounted) return null;
+
+    const modalContent = (
+      <AnimatePresence>
+        {deleteModal.open && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeDeleteModal}
+              className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm"
+            />
+
+            {/* Modal Container */}
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ type: "spring", duration: 0.5 }}
+                onClick={(e) => e.stopPropagation()}
+                className="
+                  w-full max-w-md pointer-events-auto
+                  bg-white/90 backdrop-blur-xl
+                  rounded-3xl
+                  shadow-2xl shadow-red-500/10
+                  border border-white/50
+                  overflow-hidden
+                "
+              >
+                {/* Header with gradient */}
+                <div className="relative bg-gradient-to-br from-red-50 to-orange-50 p-6 pb-8">
+                  {/* Close button */}
+                  <motion.button
+                    whileHover={{ scale: 1.1, rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={closeDeleteModal}
+                    disabled={deleting}
+                    className="
+                      cursor-pointer
+                      absolute top-4 right-4
+                      w-8 h-8 rounded-full
+                      bg-white/80 backdrop-blur
+                      border border-black/5
+                      flex items-center justify-center
+                      text-black/60 hover:text-black
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      transition-colors
+                    "
+                  >
+                    <X size={18} strokeWidth={2.5} />
+                  </motion.button>
+
+                  {/* Icon */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: "spring" }}
+                    className="
+                      w-16 h-16 mx-auto mb-4
+                      rounded-2xl
+                      bg-gradient-to-br from-red-500 to-orange-500
+                      flex items-center justify-center
+                      shadow-lg shadow-red-500/30
+                    "
+                  >
+                    <Trash2 className="text-white" size={32} strokeWidth={2.5} />
+                  </motion.div>
+
+                  {/* Title */}
+                  <motion.h3
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-2xl font-bold text-center text-black"
+                  >
+                    Delete Category
+                  </motion.h3>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35 }}
+                    className="text-sm text-center text-black/60 mt-2"
+                  >
+                    This action cannot be undone
+                  </motion.p>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 space-y-4">
+                  {/* Category Info Box */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="
+                      p-4 rounded-xl
+                      bg-white/70 backdrop-blur
+                      border border-black/10
+                    "
+                  >
+                    <p className="text-xs font-medium text-black/50 mb-1">
+                      Category Name
+                    </p>
+                    <p className="text-sm font-semibold text-black">
+                      {deleteModal.name}
+                    </p>
+                  </motion.div>
+
+                  {/* Warning message */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.45 }}
+                    className="
+                      flex items-start gap-3 p-4 rounded-xl
+                      bg-amber-50/80 backdrop-blur
+                      border border-amber-200/50
+                    "
+                  >
+                    <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <AlertTriangle className="text-amber-600" size={16} strokeWidth={2.5} />
+                    </div>
+                    <p className="text-xs text-amber-700 leading-relaxed">
+                      Deleting this category will affect all products associated with it. Make sure you want to proceed.
+                    </p>
+                  </motion.div>
+
+                  {/* Action Buttons */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="flex gap-3 pt-2"
+                  >
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={closeDeleteModal}
+                      disabled={deleting}
+                      className="
+                        cursor-pointer
+                        flex-1 px-5 py-3 rounded-xl
+                        bg-white/70 backdrop-blur
+                        border border-black/10
+                        text-black font-semibold text-sm
+                        hover:bg-white hover:border-black/20
+                        disabled:opacity-50 disabled:cursor-not-allowed
+                        transition-all duration-200
+                      "
+                    >
+                      Cancel
+                    </motion.button>
+
+                    <motion.button
+                      whileHover={{ scale: deleting ? 1 : 1.02 }}
+                      whileTap={{ scale: deleting ? 1 : 0.98 }}
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="
+                        cursor-pointer
+                        flex-1 px-5 py-3 rounded-xl
+                        bg-gradient-to-r from-red-600 to-orange-600
+                        text-white font-semibold text-sm
+                        shadow-lg shadow-red-500/30
+                        hover:shadow-xl hover:shadow-red-500/40
+                        disabled:opacity-60 disabled:cursor-not-allowed
+                        transition-all duration-200
+                        flex items-center justify-center gap-2
+                      "
+                    >
+                      {deleting ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                          />
+                          <span>Deleting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 size={16} strokeWidth={2.5} />
+                          <span>Delete</span>
+                        </>
+                      )}
+                    </motion.button>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
+    );
+
+    return createPortal(modalContent, document.body);
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -278,92 +500,7 @@ export default function ManageCategories() {
       </motion.div>
 
       {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {deleteModal.open && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={closeDeleteModal}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
-            />
-
-            {/* Modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="
-                fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                w-[90%] max-w-md
-                bg-white/90 backdrop-blur-xl
-                border border-black/10
-                rounded-2xl
-                shadow-2xl
-                p-6
-                z-50
-              "
-            >
-              {/* Icon */}
-              <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
-                  <AlertTriangle size={28} className="text-red-600" strokeWidth={2.5} />
-                </div>
-              </div>
-
-              {/* Title */}
-              <h3 className="text-xl font-bold text-black/90 text-center mb-2">
-                Delete Category?
-              </h3>
-
-              {/* Description */}
-              <p className="text-sm text-black/60 text-center mb-6">
-                Are you sure you want to delete <strong>"{deleteModal.name}"</strong>? This action cannot be undone.
-              </p>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                <button
-                  onClick={closeDeleteModal}
-                  disabled={deleting}
-                  className="
-                    cursor-pointer
-                    flex-1 py-2.5 px-4
-                    rounded-xl
-                    text-sm font-medium
-                    bg-gray-200 text-black/70
-                    hover:bg-gray-300
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    transition-all duration-200
-                  "
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="
-                    cursor-pointer
-                    flex-1 py-2.5 px-4
-                    rounded-xl
-                    text-sm font-medium
-                    bg-red-500 text-white
-                    hover:bg-red-600
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    transition-all duration-200
-                    shadow-sm hover:shadow
-                  "
-                >
-                  {deleting ? "Deleting..." : "Delete"}
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      <DeleteCategoryModal />
     </div>
   );
 }
