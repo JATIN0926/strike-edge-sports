@@ -28,10 +28,11 @@ export default function CheckoutPage() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (cartArray.length === 0) {
+    // Only redirect to cart if cart is empty on initial load
+    if (cartArray.length === 0 && !isPlacingOrder) {
       router.replace("/cart");
     }
-  }, [cartArray, router]);
+  }, []);
 
   /* ---------------- Auto-select default address ---------------- */
   useEffect(() => {
@@ -74,12 +75,9 @@ export default function CheckoutPage() {
     }
 
     setIsPlacingOrder(true);
-    if (!selectedAddressId) {
-      toast.error("Please select delivery address");
-      return;
-    }
 
     if (paymentMethod !== "cod") {
+      setIsPlacingOrder(false);
       toast("Online payment coming soon 🚀");
       return;
     }
@@ -120,12 +118,13 @@ export default function CheckoutPage() {
         { withCredentials: true }
       );
 
-      toast.success("Order placed successfully 🎉", {
-        id: "place-order",
-      });
+      toast.success("Order placed successfully 🎉", { id: "place-order" });
 
-      dispatch(clearCart());
-      router.push("/order-success");
+      router.replace("/order-success");
+      setTimeout(() => {
+        dispatch(clearCart());
+      }, 500);
+
     } catch (err) {
       setIsPlacingOrder(false);
       console.log(err);

@@ -50,7 +50,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -58,7 +58,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 pointer-events-none">
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}

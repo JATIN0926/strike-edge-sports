@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
       <body>
         <Toaster
           containerStyle={{
-            zIndex: 200,
+            zIndex: 300,
           }}
         />
         <Providers>

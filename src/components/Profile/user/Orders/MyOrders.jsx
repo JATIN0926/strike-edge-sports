@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import { Package, Calendar, CreditCard, MapPin, X } from "lucide-react";
-
+import { Package, Calendar, CreditCard, MapPin, X, ArrowRight } from "lucide-react";
+import Link from "next/link"
 import OrderStatusBadge from "./OrderStatusBadge";
 import CancelOrderModal from "./CancelOrderModal";
 import AppLoader from "@/components/Loader/AppLoader";
@@ -68,12 +68,44 @@ export default function MyOrders() {
         className="
           p-16 text-center rounded-3xl
           bg-gradient-to-br from-blue-50/80 to-emerald-50/80
-          backdrop-blur-xl border border-white/50
+          backdrop-blur-xl border border-white/50 flex flex-col w-full items-center justify-center gap-4
         "
       >
         <div className="text-6xl mb-4">🛒</div>
-        <h3 className="text-xl font-bold text-black mb-2">No orders yet</h3>
+        <h3 className="text-xl font-bold text-black">No orders yet</h3>
         <p className="text-black/60">Start shopping to see your orders here!</p>
+        <Link
+            href={`/products`}
+          >
+            <motion.button
+              whileHover={{ scale: 1.05, x: 5 }}
+              whileTap={{ scale: 0.95 }}
+              className="
+                group
+                cursor-pointer
+                flex items-center gap-2
+                px-8 py-3.5
+                rounded-xl
+                bg-gradient-to-r from-emerald-500 to-green-600
+                text-white text-sm font-semibold
+                shadow-lg shadow-emerald-500/30
+                hover:shadow-xl hover:shadow-emerald-500/40
+                transition-all duration-300
+                relative
+                overflow-hidden
+              "
+            >
+              {/* Background shimmer effect */}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
+              
+              <span className="relative">Start Shopping</span>
+              <ArrowRight 
+                size={18} 
+                className="relative group-hover:translate-x-1 transition-transform duration-300" 
+                strokeWidth={2.5}
+              />
+            </motion.button>
+          </Link>
       </motion.div>
     );
   }
