@@ -250,9 +250,56 @@ export default function ProductDetail({ productId }) {
                     Add to Cart
                   </motion.button>
                 ) : (
-                  /* qty control (same as before, unchanged) */
-                  <motion.div className="flex items-center justify-center gap-6 ...">
-                    {/* minus / qty / plus */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="
+                    flex-1 flex items-center justify-center gap-6
+                    px-6 py-3 rounded-xl
+                    bg-white/70 backdrop-blur-xl
+                    border border-emerald-500/50
+                    shadow-lg shadow-emerald-500/20
+                  "
+                  >
+                    {/* Minus Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleDecrease}
+                      className="
+                      h-8 w-8 rounded-full
+                      flex items-center justify-center
+                      bg-white/80 border border-black/10
+                      text-black/70 hover:text-black
+                      hover:bg-white hover:border-emerald-500/30
+                      transition-all duration-200
+                    "
+                    >
+                      <Minus size={16} />
+                    </motion.button>
+
+                    {/* Quantity */}
+                    <span className="text-lg font-bold text-black min-w-[24px] text-center">
+                      {cartItem.quantity}
+                    </span>
+
+                    {/* Plus Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleIncrease}
+                      className="
+                      h-8 w-8 rounded-full
+                      flex items-center justify-center
+                      bg-emerald-500 border border-emerald-600
+                      text-white
+                      hover:bg-emerald-600
+                      transition-all duration-200
+                      shadow-lg shadow-emerald-500/30
+                    "
+                    >
+                      <Plus size={16} />
+                    </motion.button>
                   </motion.div>
                 )}
               </div>

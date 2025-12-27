@@ -13,6 +13,7 @@ const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 export default function AddProduct() {
   const [categories, setCategories] = useState([]);
+  const [productTypes, setProductTypes] = useState([]);
   const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [editorKey, setEditorKey] = useState(0);
@@ -20,7 +21,7 @@ export default function AddProduct() {
 
   const [form, setForm] = useState({
     title: "",
-    productType: "bat",
+    productType: "",
     category: "",
     grade: "",
     price: "",
@@ -34,6 +35,13 @@ export default function AddProduct() {
       .get(`${API}/api/categories`)
       .then((res) => setCategories(res.data.categories))
       .catch(() => toast.error("Failed to load categories"));
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(`${API}/api/product-types`)
+      .then((res) => setProductTypes(res.data.productTypes))
+      .catch(() => toast.error("Failed to load product types"));
   }, []);
 
   const handleImageUpload = async (files) => {
@@ -122,6 +130,7 @@ export default function AddProduct() {
     if (!form.category) return toast.error("Please select a category");
     if (!form.grade.trim()) return toast.error("Grade is required");
     if (!form.price) return toast.error("Price is required");
+    if (!form.productType) return toast.error("Please select a product type");
     if (images.length === 0)
       return toast.error("At least one image is required");
 
@@ -142,7 +151,7 @@ export default function AddProduct() {
       // reset form
       setForm({
         title: "",
-        productType: "bat",
+        productType: "",
         category: "",
         grade: "",
         price: "",
@@ -231,10 +240,12 @@ export default function AddProduct() {
                 setForm({ ...form, productType: e.target.value })
               }
             >
-              <option value="bat">Bat</option>
-              <option value="ball">Ball</option>
-              <option value="gloves">Gloves</option>
-              <option value="pads">Pads</option>
+              <option value="">Select product type</option>
+              {productTypes.map((type) => (
+                <option key={type._id} value={type.slug}>
+                  {type.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -358,7 +369,7 @@ export default function AddProduct() {
           <label className="block text-sm font-semibold mb-3 text-black/80">
             Product Attributes
           </label>
-          
+
           <AnimatePresence>
             {form.attributes.map((attr, i) => (
               <motion.div
@@ -378,9 +389,7 @@ export default function AddProduct() {
                     transition-all duration-200
                   "
                   value={attr.key}
-                  onChange={(e) =>
-                    updateAttribute(i, "key", e.target.value)
-                  }
+                  onChange={(e) => updateAttribute(i, "key", e.target.value)}
                 />
                 <input
                   placeholder="Value (e.g., 1.2 kg)"
@@ -391,9 +400,7 @@ export default function AddProduct() {
                     transition-all duration-200
                   "
                   value={attr.value}
-                  onChange={(e) =>
-                    updateAttribute(i, "value", e.target.value)
-                  }
+                  onChange={(e) => updateAttribute(i, "value", e.target.value)}
                 />
                 <button
                   onClick={() => removeAttribute(i)}

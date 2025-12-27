@@ -139,11 +139,34 @@ export default function AdminOrdersReceived() {
         <AppLoader text="Loading orders details…" />
       ) : orders.length === 0 ? (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-12 px-4 rounded-2xl bg-white/40 backdrop-blur-md border border-black/10"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className="
+      text-center py-16 sm:py-20 px-6
+      rounded-2xl
+      bg-white/50 backdrop-blur-xl
+      border border-black/10
+      shadow-sm
+    "
         >
-          <p className="text-sm text-black/50">No orders found</p>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            className="text-5xl sm:text-6xl mb-4"
+          >
+            📦
+          </motion.div>
+
+          <h3 className="text-lg sm:text-xl font-semibold text-black/90 mb-2">
+            No Orders Received
+          </h3>
+
+          <p className="text-sm text-black/50 max-w-sm mx-auto leading-relaxed">
+            You haven't received any customer orders yet. Orders will appear
+            here once customers start placing them.
+          </p>
         </motion.div>
       ) : (
         <div className="space-y-4">
@@ -174,7 +197,7 @@ export default function AdminOrdersReceived() {
                   <p className="text-sm text-black/50">
                     Order ID: <span className="font-mono">{order.orderId}</span>
                   </p>
-                  
+
                   {/* Shipping Address */}
                   <div className="text-sm text-black/60 space-y-0.5">
                     <p className="font-medium text-black/70">
@@ -182,7 +205,10 @@ export default function AdminOrdersReceived() {
                     </p>
                     <p>📞 {order.shippingAddress.phone}</p>
                     <p className="line-clamp-2">
-                      📍 {order.shippingAddress.street}, {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.pincode}
+                      📍 {order.shippingAddress.street},{" "}
+                      {order.shippingAddress.city},{" "}
+                      {order.shippingAddress.state} -{" "}
+                      {order.shippingAddress.pincode}
                     </p>
                   </div>
                 </div>
@@ -194,7 +220,7 @@ export default function AdminOrdersReceived() {
                     <span className="text-sm font-medium px-3 py-1.5 rounded-full bg-black/5 text-black/60">
                       {order.paymentMethod}
                     </span>
-                    
+
                     {order.paymentInfo?.status && (
                       <span
                         className={`
@@ -219,9 +245,7 @@ export default function AdminOrdersReceived() {
                   {/* Update Status Dropdown */}
                   <select
                     value={order.orderStatus}
-                    onChange={(e) =>
-                      updateStatus(order._id, e.target.value)
-                    }
+                    onChange={(e) => updateStatus(order._id, e.target.value)}
                     className="
                       w-full lg:w-auto
                       rounded-lg px-3 py-2
@@ -245,7 +269,9 @@ export default function AdminOrdersReceived() {
 
               {/* Items Grid */}
               <div className="mt-4 rounded-xl bg-black/5 backdrop-blur-sm p-3">
-                <p className="text-sm font-medium text-black/60 mb-2">Order Items:</p>
+                <p className="text-sm font-medium text-black/60 mb-2">
+                  Order Items:
+                </p>
                 <div className="space-y-2">
                   {order.items.map((item, i) => (
                     <div
@@ -258,7 +284,7 @@ export default function AdminOrdersReceived() {
                         alt={item.title}
                         className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-lg border border-black/10"
                       />
-                      
+
                       {/* Product Details */}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm sm:text-base font-medium text-black/90 truncate">
@@ -297,16 +323,17 @@ export default function AdminOrdersReceived() {
               </div>
 
               {/* Cancellation Info */}
-              {order.orderStatus === "CANCELLED" && order.cancellationReason && (
-                <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
-                  <p className="text-sm font-medium text-red-700">
-                    Cancelled by {order.cancelledBy}
-                  </p>
-                  <p className="text-sm text-red-600 mt-1">
-                    Reason: {order.cancellationReason}
-                  </p>
-                </div>
-              )}
+              {order.orderStatus === "CANCELLED" &&
+                order.cancellationReason && (
+                  <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200">
+                    <p className="text-sm font-medium text-red-700">
+                      Cancelled by {order.cancelledBy}
+                    </p>
+                    <p className="text-sm text-red-600 mt-1">
+                      Reason: {order.cancellationReason}
+                    </p>
+                  </div>
+                )}
 
               {/* Footer */}
               <div className="mt-3 text-sm text-black/40">
@@ -350,7 +377,8 @@ export default function AdminOrdersReceived() {
           </button>
 
           <span className="text-xs sm:text-sm text-black/70 px-2">
-            Page <strong className="text-black/90">{page}</strong> of {totalPages}
+            Page <strong className="text-black/90">{page}</strong> of{" "}
+            {totalPages}
           </span>
 
           <button

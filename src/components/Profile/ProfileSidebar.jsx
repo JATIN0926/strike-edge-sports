@@ -18,6 +18,10 @@ export default function ProfileSidebar({ activeTab, setActiveTab, isAdmin }) {
       key: "categories",
       label: "Manage Categories",
     },
+    {
+      key: "product-types",
+      label: "Manage Product Types",
+    },
   ];
 
   const tabs = isAdmin ? adminTabs : userTabs;

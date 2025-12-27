@@ -10,6 +10,7 @@ import ProductsList from "./admin/Products_Tab/ProductsList";
 import AdminOrdersReceived from "./admin/AdminOrdersReceived";
 import MyOrders from "./user/Orders/MyOrders";
 import SavedProducts from "./user/SavedProducts";
+import ManageProductTypes from "./admin/ManageProductTypes";
 
 export default function ProfileLayout() {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -32,10 +33,11 @@ export default function ProfileLayout() {
 
     // admin tabs
     if (isAdmin) {
-      if (activeTab === "categories") return <ManageCategories />;
       if (activeTab === "add-product") return <AddProduct />;
       if (activeTab === "products") return <ProductsList />;
       if (activeTab === "orders-received") return <AdminOrdersReceived />;
+      if (activeTab === "categories") return <ManageCategories />;
+      if (activeTab === "product-types") return <ManageProductTypes />;
     }
 
     return null;
