@@ -13,11 +13,9 @@ import {
   Sparkles,
   Minus,
   Plus,
-  Heart,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, increaseQty, decreaseQty } from "@/redux/slices/cartSlice";
-import { toggleSavedProduct } from "@/redux/slices/userSlice";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -27,11 +25,11 @@ export default function ProductDetail({ productId }) {
   const [related, setRelated] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
   const [loading, setLoading] = useState(true);
-  const currentUser = useSelector((state) => state.user.currentUser);
-  const isSaved = currentUser?.savedProducts?.includes(productId);
 
+  // Get cart item from Redux
   const cartItem = useSelector((state) => state.cart.items[productId]);
 
+  /* ---------------- Fetch Product ---------------- */
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -55,6 +53,11 @@ export default function ProductDetail({ productId }) {
     fetchProduct();
   }, [productId]);
 
+  const isOutOfStock =
+    product &&
+    (product.stock === 0 || (cartItem && cartItem.quantity >= product.stock));
+
+  /* ---------------- Cart Handlers ---------------- */
   const handleAddToCart = () => {
     if (!product) return;
 
@@ -70,6 +73,12 @@ export default function ProductDetail({ productId }) {
   };
 
   const handleIncrease = () => {
+    if (cartItem && cartItem.quantity >= product.stock) {
+      toast.error(
+        `Only ${product.stock} items available in stock , Can't Add More`
+      );
+      return;
+    }
     dispatch(increaseQty(productId));
   };
 
@@ -77,34 +86,13 @@ export default function ProductDetail({ productId }) {
     dispatch(decreaseQty(productId));
   };
 
-  const handleToggleSave = async () => {
-    if (!currentUser) {
-      toast.error("Please login to save products");
-      return;
-    }
-
-    try {
-      // optimistic update
-      dispatch(toggleSavedProduct(productId));
-
-      await axios.post(
-        `${API}/api/products/saved/${productId}`,
-        {},
-        { withCredentials: true }
-      );
-
-      toast.success(isSaved ? "Removed from saved" : "Saved for later ❤️");
-    } catch (err) {
-      dispatch(toggleSavedProduct(productId));
-      toast.error("Failed to save product");
-    }
-  };
-
   if (loading) {
     return <AppLoader text="Loading product details…" />;
   }
 
   if (!product) return null;
+
+  /* ========================== UI ========================== */
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f7f8fa] via-white to-blue-50/30 pt-28">
@@ -123,7 +111,14 @@ export default function ProductDetail({ productId }) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="relative w-full h-[420px] bg-white/70 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/50 shadow-2xl shadow-blue-500/10"
+              className={`
+                relative w-full h-[420px] backdrop-blur-xl rounded-3xl overflow-hidden border shadow-2xl
+                ${
+                  isOutOfStock
+                    ? "bg-gray-100/70 border-gray-300/50 shadow-gray-500/10"
+                    : "bg-white/70 border-white/50 shadow-blue-500/10"
+                }
+              `}
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -138,7 +133,10 @@ export default function ProductDetail({ productId }) {
                     src={product.images[activeImage].url}
                     alt={product.title}
                     fill
-                    className="object-contain p-8"
+                    className={`
+                      object-contain p-8 transition-all duration-300
+                      ${isOutOfStock ? "grayscale opacity-50" : ""}
+                    `}
                   />
                 </motion.div>
               </AnimatePresence>
@@ -148,10 +146,51 @@ export default function ProductDetail({ productId }) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="absolute top-4 left-4 px-4 py-2 rounded-full bg-emerald-500/90 backdrop-blur-sm text-white text-xs font-semibold flex items-center gap-2"
+                className={`
+                  absolute top-4 left-4 px-4 py-2 rounded-full backdrop-blur-sm text-xs font-semibold flex items-center gap-2
+                  ${
+                    isOutOfStock
+                      ? "bg-red-500/90 text-white"
+                      : "bg-emerald-500/90 text-white"
+                  }
+                `}
               >
-                <Sparkles size={14} />
-                Premium Quality
+                {isOutOfStock ? (
+                  <>
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Out of Stock
+                  </>
+                ) : product.stock <= 5 ? (
+                  <>
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Only {product.stock} left
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={14} />
+                    Premium Quality
+                  </>
+                )}
               </motion.div>
             </motion.div>
 
@@ -223,50 +262,51 @@ export default function ProductDetail({ productId }) {
               className="prose max-w-none text-black/80 bg-white/40 backdrop-blur-sm rounded-2xl p-6 border border-white/50"
               dangerouslySetInnerHTML={{ __html: product.description }}
             />
+
+            {/* Action Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="flex flex-col sm:flex-row gap-3 mt-4"
             >
-              {/* Add to Cart / Quantity */}
-              <div className="flex-1">
-                {!cartItem ? (
-                  <motion.button
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleAddToCart}
-                    className="
-          w-full px-6 py-3 rounded-xl
-          bg-gradient-to-r from-emerald-600 to-emerald-500
-          text-white font-semibold
-          shadow-md shadow-emerald-500/30
-          hover:shadow-lg hover:shadow-emerald-500/40
-          transition-all duration-300
-          flex items-center justify-center gap-2
-        "
-                  >
-                    <ShoppingCart size={18} />
-                    Add to Cart
-                  </motion.button>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="
+              {/* Add to Cart or Quantity Control */}
+              {!cartItem ? (
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleAddToCart}
+                  className="
+                    flex-1 px-6 py-3 rounded-xl
+                    bg-gradient-to-r from-emerald-600 to-emerald-500
+                    text-white font-semibold text-base
+                    shadow-lg shadow-emerald-500/30
+                    hover:shadow-xl hover:shadow-emerald-500/40
+                    transition-all duration-300
+                    flex items-center justify-center gap-2
+                  "
+                >
+                  <ShoppingCart size={18} />
+                  Add to Cart
+                </motion.button>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="
                     flex-1 flex items-center justify-center gap-6
                     px-6 py-3 rounded-xl
                     bg-white/70 backdrop-blur-xl
                     border border-emerald-500/50
                     shadow-lg shadow-emerald-500/20
                   "
-                  >
-                    {/* Minus Button */}
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={handleDecrease}
-                      className="
+                >
+                  {/* Minus Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleDecrease}
+                    className="
                       h-8 w-8 rounded-full
                       flex items-center justify-center
                       bg-white/80 border border-black/10
@@ -274,21 +314,22 @@ export default function ProductDetail({ productId }) {
                       hover:bg-white hover:border-emerald-500/30
                       transition-all duration-200
                     "
-                    >
-                      <Minus size={16} />
-                    </motion.button>
+                  >
+                    <Minus size={16} />
+                  </motion.button>
 
-                    {/* Quantity */}
-                    <span className="text-lg font-bold text-black min-w-[24px] text-center">
-                      {cartItem.quantity}
-                    </span>
+                  {/* Quantity */}
+                  <span className="text-lg font-bold text-black min-w-[24px] text-center">
+                    {cartItem.quantity}
+                  </span>
 
-                    {/* Plus Button */}
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={handleIncrease}
-                      className="
+                  {/* Plus Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={handleIncrease}
+                    // disabled={isOutOfStock}
+                    className="
                       h-8 w-8 rounded-full
                       flex items-center justify-center
                       bg-emerald-500 border border-emerald-600
@@ -297,49 +338,29 @@ export default function ProductDetail({ productId }) {
                       transition-all duration-200
                       shadow-lg shadow-emerald-500/30
                     "
-                    >
-                      <Plus size={16} />
-                    </motion.button>
-                  </motion.div>
-                )}
-              </div>
+                  >
+                    <Plus size={16} />
+                  </motion.button>
+                </motion.div>
+              )}
 
-              {/* ❤️ SAVE BUTTON */}
-              <motion.button
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleToggleSave}
-                className=" cursor-pointer
-      h-12 w-12 rounded-xl
-      bg-white/70 backdrop-blur-xl
-      border border-white/50
-      flex items-center justify-center
-      shadow-lg shadow-pink-500/10
-      hover:shadow-xl hover:shadow-pink-500/30
-      transition-all duration-300
-    "
-              >
-                <Heart
-                  size={20}
-                  className={`transition ${
-                    isSaved ? "fill-pink-500 text-pink-500" : "text-black"
-                  }`}
-                />
-              </motion.button>
-
-              {/* WhatsApp */}
+              {/* WhatsApp Button */}
               <motion.a
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 href="https://wa.me/918923765865"
                 target="_blank"
                 className="
-      px-5 py-3 rounded-xl
-      bg-white/70 backdrop-blur-xl
-      border border-white/50
-      text-emerald-600 font-semibold
-      flex items-center justify-center gap-2
-    "
+                  px-5 py-3 rounded-xl
+                  bg-white/70 backdrop-blur-xl
+                  border border-white/50
+                  text-emerald-600 font-semibold text-base
+                  shadow-lg shadow-blue-500/10
+                  hover:shadow-xl hover:shadow-blue-500/20
+                  hover:border-emerald-500/50
+                  transition-all duration-300
+                  flex items-center justify-center gap-2
+                "
               >
                 <MessageCircle size={18} />
                 WhatsApp
@@ -445,6 +466,7 @@ export default function ProductDetail({ productId }) {
               <h2 className="text-3xl font-bold text-black">
                 You May Also Like
               </h2>
+              <div className="h-1 flex-1 bg-gradient-to-r from-emerald-500/20 to-transparent rounded-full" />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
