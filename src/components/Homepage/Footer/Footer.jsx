@@ -9,6 +9,7 @@ import {
   Instagram,
   Facebook,
 } from "lucide-react";
+import Link from "next/link";
 import GoToTop from "./GoToTop";
 
 export default function Footer() {
@@ -20,31 +21,31 @@ export default function Footer() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           {/* Top section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
             {/* Left - Brand */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
-              className="text-center md:text-left"
+              className="text-center sm:text-left sm:col-span-2 md:col-span-1"
             >
               <h2 className="text-black text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
                 StrikeEdgeSports
               </h2>
-              <p className="text-black/60 mt-3 text-sm leading-relaxed max-w-xs mx-auto md:mx-0">
+              <p className="text-black/70 mt-3 text-sm sm:text-base leading-relaxed max-w-xs mx-auto sm:mx-0">
                 Premium cricket gear for every level of player. Quality
                 equipment that elevates your game.
               </p>
 
               {/* Social Links */}
-              <div className="flex items-center gap-3 mt-5 justify-center md:justify-start">
+              <div className="flex items-center gap-3 mt-6 justify-center sm:justify-start">
                 <motion.a
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   href="https://www.instagram.com/strikedgesports?igsh=MTE3aW5iZjd3cWU3Yw=="
                   target="_blank"
-                  className="p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
+                  className="cursor-pointer p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
                   aria-label="Instagram"
                 >
                   <Instagram size={18} strokeWidth={2} />
@@ -54,7 +55,7 @@ export default function Footer() {
                   whileTap={{ scale: 0.95 }}
                   href="https://www.facebook.com/share/14RWgPADDEk/"
                   target="_blank"
-                  className="p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
+                  className="cursor-pointer p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
                   aria-label="Facebook"
                 >
                   <Facebook size={18} strokeWidth={2} />
@@ -63,7 +64,7 @@ export default function Footer() {
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   href="mailto:strikedgesports10@gmail.com"
-                  className="p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
+                  className="cursor-pointer p-2 rounded-full bg-black/5 hover:bg-emerald-100 text-black/60 hover:text-emerald-600 transition-all duration-200"
                   aria-label="Email"
                 >
                   <Mail size={18} strokeWidth={2} />
@@ -71,25 +72,65 @@ export default function Footer() {
               </div>
             </motion.div>
 
-            {/* Middle - Contact */}
+            {/* Quick Links */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
               viewport={{ once: true }}
-              className="flex flex-col items-center md:items-start gap-4"
+              className="flex flex-col items-center sm:items-start gap-4"
             >
-              <h3 className="text-black font-bold text-base">Get In Touch</h3>
+              <h3 className="text-black font-bold text-base sm:text-lg">Quick Links</h3>
+              
+              <div className="flex flex-col gap-3">
+                <Link href="/about">
+                  <motion.span
+                    whileHover={{ x: 3 }}
+                    className="cursor-pointer text-sm sm:text-base text-black/70 hover:text-emerald-600 transition-colors inline-block font-medium"
+                  >
+                    About Us
+                  </motion.span>
+                </Link>
+                
+                <Link href="/policies">
+                  <motion.span
+                    whileHover={{ x: 3 }}
+                    className="cursor-pointer text-sm sm:text-base text-black/70 hover:text-emerald-600 transition-colors inline-block font-medium"
+                  >
+                    Policies
+                  </motion.span>
+                </Link>
+                
+                <Link href="/products">
+                  <motion.span
+                    whileHover={{ x: 3 }}
+                    className="cursor-pointer text-sm sm:text-base text-black/70 hover:text-emerald-600 transition-colors inline-block font-medium"
+                  >
+                    Shop Now
+                  </motion.span>
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Contact */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="flex flex-col items-center sm:items-start gap-4"
+            >
+              <h3 className="text-black font-bold text-base sm:text-lg">Get In Touch</h3>
 
               <motion.a
                 whileHover={{ x: 3 }}
                 href="tel:+918923765865"
-                className="flex items-center gap-2.5 text-black/70 text-sm hover:text-emerald-600 transition-colors group"
+                className="cursor-pointer flex items-center gap-2.5 text-black/70 text-sm sm:text-base hover:text-emerald-600 transition-colors group"
               >
                 <div className="p-2 rounded-lg bg-emerald-50 group-hover:bg-emerald-100 transition-colors">
                   <Phone size={16} strokeWidth={2.5} />
                 </div>
-                <span className="font-medium">Call Us</span>
+                <span className="font-semibold">Call Us</span>
               </motion.a>
 
               <motion.a
@@ -114,17 +155,17 @@ export default function Footer() {
               </motion.a>
             </motion.div>
 
-            {/* Right - Address */}
+            {/* Address */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
               viewport={{ once: true }}
-              className="text-center md:text-left"
+              className="flex flex-col items-center sm:items-start w-full"
             >
-              <h3 className="text-black font-bold text-base mb-4">Visit Us</h3>
-              <div className="flex items-start gap-3 text-black/60 text-sm leading-relaxed">
-                <div className="p-2 rounded-lg bg-emerald-50 mt-0.5">
+              <h3 className="text-black font-bold text-base sm:text-lg mb-4">Visit Us</h3>
+              <div className="flex items-start gap-3 text-black/70 text-sm sm:text-base leading-relaxed text-center sm:text-left">
+                <div className="p-2 rounded-lg bg-emerald-50 mt-0.5 flex-shrink-0">
                   <MapPin
                     size={16}
                     strokeWidth={2.5}
@@ -146,7 +187,7 @@ export default function Footer() {
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
             viewport={{ once: true }}
             className="text-center text-black/50 text-sm"
           >

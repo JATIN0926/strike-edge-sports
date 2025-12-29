@@ -135,7 +135,7 @@ export default function ProfileInfo() {
   const handleCloseAddressModal = () => {
     setOpenAddressModal(false);
     setAddressToEdit(null);
-  }
+  };
 
   if (!currentUser) {
     return <AppLoader text="Loading profile details…" />;
@@ -143,15 +143,15 @@ export default function ProfileInfo() {
 
   return (
     <>
-      <div className="space-y-10">
+      <div className="space-y-6 sm:space-y-8 lg:space-y-10">
         {/* Header */}
-        <h2 className="text-black text-2xl font-semibold">
+        <h2 className="text-black text-xl sm:text-2xl font-semibold">
           Profile Information
         </h2>
 
         {/* User Summary */}
-        <div className="flex items-center gap-5">
-          <div className="relative h-20 w-20">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5">
+          <div className="relative h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0">
             <Image
               src={currentUser.photoURL}
               alt="Profile"
@@ -160,31 +160,37 @@ export default function ProfileInfo() {
             />
           </div>
 
-          <div>
-            <p className="text-black font-medium">{currentUser.email}</p>
-            <p className="text-black/50 text-sm">Logged in via Google</p>
+          <div className="text-center sm:text-left">
+            <p className="text-black font-medium text-sm sm:text-base break-all">
+              {currentUser.email}
+            </p>
+            <p className="text-black/50 text-xs sm:text-sm">
+              Logged in via Google
+            </p>
           </div>
         </div>
 
         {/* Basic Info */}
         <div
           className="
-            max-w-lg space-y-4
+            max-w-full lg:max-w-lg space-y-4
             rounded-2xl
             bg-white/70 backdrop-blur-xl
             border border-black/10
-            p-6
+            p-4 sm:p-6
           "
         >
           <div>
-            <label className="text-black/70 text-sm">Full Name</label>
+            <label className="text-black/70 text-xs sm:text-sm">
+              Full Name
+            </label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="
                 mt-1 w-full rounded-xl
                 bg-white border border-black/15
-                px-4 py-2 text-black
+                px-3 sm:px-4 py-2 text-sm sm:text-base text-black
                 outline-none
                 focus:border-indigo-500
                 focus:ring-2 focus:ring-indigo-500/20
@@ -193,7 +199,9 @@ export default function ProfileInfo() {
           </div>
 
           <div>
-            <label className="text-black/70 text-sm">Phone Number</label>
+            <label className="text-black/70 text-xs sm:text-sm">
+              Phone Number
+            </label>
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -201,7 +209,7 @@ export default function ProfileInfo() {
               className="
                 mt-1 w-full rounded-xl
                 bg-white border border-black/15
-                px-4 py-2 text-black
+                px-3 sm:px-4 py-2 text-sm sm:text-base text-black
                 outline-none
                 focus:border-indigo-500
                 focus:ring-2 focus:ring-indigo-500/20
@@ -209,21 +217,23 @@ export default function ProfileInfo() {
             />
           </div>
 
-          <p className="text-black/50 text-xs flex items-center gap-1">
-            <Info size={12} />
-            You can edit your information anytime. Don’t forget to save your
-            changes.
+          <p className="text-black/50 text-xs flex items-start gap-1.5">
+            <Info size={14} className="flex-shrink-0 mt-0.5" />
+            <span>
+              You can edit your information anytime. Don't forget to save your
+              changes.
+            </span>
           </p>
 
           <button
             onClick={handleSaveProfile}
             className="
               cursor-pointer
-              mt-2 inline-flex items-center justify-center
+              mt-2 w-full sm:w-auto inline-flex items-center justify-center
               rounded-full
               bg-gradient-to-r from-indigo-500 to-blue-500
               text-white
-              px-6 py-2
+              px-6 py-2.5
               text-sm font-medium
               hover:opacity-90 transition
               shadow-[0_8px_20px_rgba(99,102,241,0.35)]
@@ -235,18 +245,20 @@ export default function ProfileInfo() {
 
         {/* Addresses */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-black text-xl font-semibold">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h3 className="text-black text-lg sm:text-xl font-semibold">
               Saved Addresses
             </h3>
 
             <button
               onClick={() => setOpenAddressModal(true)}
-              className=" cursor-pointer
-                inline-flex items-center gap-2
+              className="
+                cursor-pointer
+                w-full sm:w-auto
+                inline-flex items-center justify-center gap-2
                 rounded-full
                 border border-black/15
-                px-4 py-2
+                px-4 py-2.5
                 text-sm text-black
                 hover:bg-black/5 transition
               "
@@ -269,38 +281,41 @@ export default function ProfileInfo() {
                     flex flex-col gap-2
                   "
                 >
-                  <div className="flex items-center justify-between">
-                    <p className="text-black font-medium">{address.fullName}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-black font-medium text-sm sm:text-base break-words">
+                      {address.fullName}
+                    </p>
 
                     {address.isDefault ? (
-                      <span className="text-xs text-green-600 font-semibold">
+                      <span className="text-xs text-green-600 font-semibold whitespace-nowrap">
                         Default
                       </span>
                     ) : (
                       <button
                         onClick={() => handleSetDefault(address._id)}
                         className="
-        text-xs font-medium
-        text-indigo-600
-        hover:underline
-        cursor-pointer
-      "
+                          text-xs font-medium
+                          text-indigo-600
+                          hover:underline
+                          cursor-pointer
+                          whitespace-nowrap
+                        "
                       >
-                        Mark as default
+                        Mark default
                       </button>
                     )}
                   </div>
 
-                  <p className="text-black/70 text-sm">
+                  <p className="text-black/70 text-xs sm:text-sm break-words">
                     {address.street}, {address.city}, {address.state} –{" "}
                     {address.pincode}
                   </p>
 
-                  <p className="text-black/60 text-sm">
+                  <p className="text-black/60 text-xs sm:text-sm">
                     Phone: {address.phone}
                   </p>
 
-                  <div className="flex gap-4 mt-2 text-sm">
+                  <div className="flex gap-4 mt-2 text-xs sm:text-sm">
                     <button
                       onClick={() => {
                         setAddressToEdit(address);

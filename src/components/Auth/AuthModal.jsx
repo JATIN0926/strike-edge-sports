@@ -31,14 +31,14 @@ export default function AuthModal({ open, onClose, onGoogleSignIn }) {
               bg-white/80 backdrop-blur-xl
               border border-black/10
               shadow-[0_20px_50px_rgba(0,0,0,0.15)]
-              p-6
+              p-5 sm:p-6
             "
           >
             {/* Close */}
             <button
               onClick={onClose}
               className="
-                absolute top-4 right-4
+                absolute top-3 right-3 sm:top-4 sm:right-4
                 text-black/50 hover:text-black
                 cursor-pointer
               "
@@ -47,31 +47,32 @@ export default function AuthModal({ open, onClose, onGoogleSignIn }) {
             </button>
 
             {/* Content */}
-            <div className="flex flex-col items-center text-center gap-4">
-              <h2 className="text-black text-xl font-semibold">
+            <div className="flex flex-col items-center text-center gap-3 sm:gap-4">
+              <h2 className="text-black text-lg sm:text-xl font-semibold">
                 Welcome to StrikeEdgeSports
               </h2>
 
-              <p className="text-black/60 text-sm">
+              <p className="text-black/60 text-xs sm:text-sm">
                 Sign in to continue shopping premium cricket gear
               </p>
 
               <button
                 onClick={onGoogleSignIn}
                 className="
-                  cursor-pointer mt-4 w-full py-2.5 rounded-full
+                  cursor-pointer mt-3 sm:mt-4 w-full py-2.5 rounded-full
                   bg-white text-black
                   border border-black/15
-                  text-sm font-semibold
+                  text-xs sm:text-sm font-semibold
                   hover:bg-emerald-50 hover:border-emerald-300
                   transition
-                  flex items-center justify-center gap-3
+                  flex items-center justify-center gap-2 sm:gap-3
                 "
               >
                 {/* Google Icon */}
                 <svg
-                  width="18"
-                  height="18"
+                  width="16"
+                  height="16"
+                  className="sm:w-[18px] sm:h-[18px]"
                   viewBox="0 0 48 48"
                   xmlns="http://www.w3.org/2000/svg"
                 >

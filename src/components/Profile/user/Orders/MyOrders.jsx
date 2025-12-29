@@ -66,54 +66,46 @@ export default function MyOrders() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="
-          p-16 text-center rounded-3xl
+          p-8 sm:p-16 text-center rounded-3xl
           bg-gradient-to-br from-blue-50/80 to-emerald-50/80
           backdrop-blur-xl border border-white/50 flex flex-col w-full items-center justify-center gap-4
         "
       >
-        <div className="text-6xl mb-4">🛒</div>
-        <h3 className="text-xl font-bold text-black">No orders yet</h3>
-        <p className="text-black/60">Start shopping to see your orders here!</p>
-        <Link
-            href={`/products`}
+        <div className="text-4xl sm:text-6xl mb-4">🛒</div>
+        <h3 className="text-lg sm:text-xl font-bold text-black">No orders yet</h3>
+        <p className="text-sm sm:text-base text-black/60">Start shopping to see your orders here!</p>
+        <Link href="/products">
+          <motion.button
+            whileHover={{ scale: 1.05, x: 5 }}
+            whileTap={{ scale: 0.95 }}
+            className="
+              group cursor-pointer
+              flex items-center gap-2
+              px-6 sm:px-8 py-3 sm:py-3.5
+              rounded-xl
+              bg-gradient-to-r from-emerald-500 to-green-600
+              text-white text-sm font-semibold
+              shadow-lg shadow-emerald-500/30
+              hover:shadow-xl hover:shadow-emerald-500/40
+              transition-all duration-300
+              relative overflow-hidden
+            "
           >
-            <motion.button
-              whileHover={{ scale: 1.05, x: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="
-                group
-                cursor-pointer
-                flex items-center gap-2
-                px-8 py-3.5
-                rounded-xl
-                bg-gradient-to-r from-emerald-500 to-green-600
-                text-white text-sm font-semibold
-                shadow-lg shadow-emerald-500/30
-                hover:shadow-xl hover:shadow-emerald-500/40
-                transition-all duration-300
-                relative
-                overflow-hidden
-              "
-            >
-              {/* Background shimmer effect */}
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
-              
-              <span className="relative">Start Shopping</span>
-              <ArrowRight 
-                size={18} 
-                className="relative group-hover:translate-x-1 transition-transform duration-300" 
-                strokeWidth={2.5}
-              />
-            </motion.button>
-          </Link>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
+            <span className="relative">Start Shopping</span>
+            <ArrowRight 
+              size={18} 
+              className="relative group-hover:translate-x-1 transition-transform duration-300" 
+              strokeWidth={2.5}
+            />
+          </motion.button>
+        </Link>
       </motion.div>
     );
   }
 
-  console.log(orders);
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {orders.map((order, index) => {
         const canCancel = ["PLACED", "CONFIRMED"].includes(order.orderStatus);
         const isExpanded = expandedOrder === order._id;
@@ -126,7 +118,7 @@ export default function MyOrders() {
             transition={{ delay: index * 0.05 }}
             className="
               relative overflow-hidden
-              rounded-3xl
+              rounded-2xl sm:rounded-3xl
               bg-white/70 backdrop-blur-xl
               border border-white/50
               shadow-lg shadow-blue-500/5
@@ -139,27 +131,27 @@ export default function MyOrders() {
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-emerald-500" />
 
             {/* Main Content */}
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className="flex items-start sm:items-center gap-3 sm:gap-4">
                   <motion.div
                     whileHover={{ rotate: 10 }}
                     className="
-                      w-12 h-12 rounded-2xl
+                      w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex-shrink-0
                       bg-gradient-to-br from-emerald-500/20 to-blue-500/20
                       flex items-center justify-center
                     "
                   >
-                    <Package className="text-emerald-600" size={24} />
+                    <Package className="text-emerald-600" size={20} />
                   </motion.div>
 
-                  <div>
-                    <p className="text-lg font-bold text-black">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-base sm:text-lg font-bold text-black truncate">
                       Order #{order.orderId}
                     </p>
-                    <div className="flex items-center gap-2 text-sm text-black/60 mt-1">
-                      <Calendar size={14} />
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-black/60 mt-1">
+                      <Calendar size={12} className="flex-shrink-0" />
                       <span>
                         {new Date(order.createdAt).toLocaleDateString("en-IN", {
                           day: "numeric",
@@ -171,11 +163,13 @@ export default function MyOrders() {
                   </div>
                 </div>
 
-                <OrderStatusBadge status={order.orderStatus} />
+                <div className="flex justify-end sm:justify-start">
+                  <OrderStatusBadge status={order.orderStatus} />
+                </div>
               </div>
 
               {/* Items Preview */}
-              <div className="space-y-3 mb-5">
+              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-5">
                 {order.items
                   .slice(0, isExpanded ? undefined : 3)
                   .map((item) => (
@@ -183,34 +177,32 @@ export default function MyOrders() {
                       key={item.productId}
                       whileHover={{ x: 4 }}
                       className="
-                      flex items-center justify-between
-                      p-3 rounded-xl
-                      bg-white/50 backdrop-blur
-                      border border-white/50
-                      hover:border-blue-300/50
-                      transition-all duration-200
-                    "
+                        flex flex-col sm:flex-row items-center justify-center   gap-4 sm:gap-3
+                        p-2.5 sm:p-3 rounded-xl
+                        bg-white/50 backdrop-blur
+                        border border-white/50
+                        hover:border-blue-300/50
+                        transition-all duration-200
+                      "
                     >
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white border border-black/5">
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="w-full h-full object-contain p-1"
-                          />
-                        </div>
-
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-black line-clamp-1">
-                            {item.title}
-                          </p>
-                          <p className="text-xs text-black/60 mt-0.5">
-                            Qty: {item.quantity} × ₹{item.price}
-                          </p>
-                        </div>
+                      <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl overflow-hidden bg-white border border-black/5 flex-shrink-0">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-full object-contain p-1"
+                        />
                       </div>
 
-                      <p className="text-sm font-bold text-emerald-600">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-semibold text-black line-clamp-1">
+                          {item.title}
+                        </p>
+                        <p className="text-xs text-black/60 mt-0.5">
+                          Qty: {item.quantity} × ₹{item.price}
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm font-bold text-emerald-600 whitespace-nowrap">
                         ₹{item.price * item.quantity}
                       </p>
                     </motion.div>
@@ -221,7 +213,7 @@ export default function MyOrders() {
                     whileHover={{ scale: 1.02 }}
                     onClick={() => setExpandedOrder(order._id)}
                     className="
-                      w-full py-2 text-sm text-blue-600 font-medium
+                      w-full py-2 text-xs sm:text-sm text-blue-600 font-medium
                       hover:text-blue-700 transition
                     "
                   >
@@ -234,7 +226,7 @@ export default function MyOrders() {
                     whileHover={{ scale: 1.02 }}
                     onClick={() => setExpandedOrder(null)}
                     className="
-                      w-full py-2 text-sm text-black/60 font-medium
+                      w-full py-2 text-xs sm:text-sm text-black/60 font-medium
                       hover:text-black transition
                     "
                   >
@@ -244,101 +236,99 @@ export default function MyOrders() {
               </div>
 
               {/* Payment & Shipping Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-5">
                 {/* Payment Method */}
-                <div
-                  className="
-                    flex items-center gap-3 p-3 rounded-xl
-                    bg-gradient-to-br from-emerald-50/80 to-blue-50/80
-                    backdrop-blur border border-white/50
-                  "
-                >
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                    <CreditCard className="text-emerald-600" size={16} />
+                <div className="
+                  flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl
+                  bg-gradient-to-br from-emerald-50/80 to-blue-50/80
+                  backdrop-blur border border-white/50
+                ">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <CreditCard className="text-emerald-600" size={14} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-black/60">Payment</p>
-                    <p className="text-sm font-semibold text-black">
+                    <p className="text-xs sm:text-sm font-semibold text-black truncate">
                       {order.paymentMethod}
                     </p>
                   </div>
                 </div>
 
                 {/* Shipping Address */}
-                <div
-                  className="
-                    flex items-center gap-3 p-3 rounded-xl
-                    bg-gradient-to-br from-blue-50/80 to-emerald-50/80
-                    backdrop-blur border border-white/50
-                  "
-                >
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                    <MapPin className="text-blue-600" size={16} />
+                <div className="
+                  flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl
+                  bg-gradient-to-br from-blue-50/80 to-emerald-50/80
+                  backdrop-blur border border-white/50
+                ">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="text-blue-600" size={14} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-black/60">Deliver to</p>
-                    <p className="text-sm font-semibold text-black truncate">
-                      {order.shippingAddress.city},{" "}
-                      {order.shippingAddress.state}
+                    <p className="text-xs sm:text-sm font-semibold text-black truncate">
+                      {order.shippingAddress.city}, {order.shippingAddress.state}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-5 border-t border-black/5">
-                <div>
-                  <p className="text-sm text-black/60">Total Amount</p>
-                  <p className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
-                    ₹{order.totalAmount}
-                  </p>
-                </div>
+              <div className="flex flex-col gap-3 sm:gap-4 pt-4 sm:pt-5 border-t border-black/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs sm:text-sm text-black/60">Total Amount</p>
+                    <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
+                      ₹{order.totalAmount}
+                    </p>
+                  </div>
 
-                {canCancel && (
-                  <motion.button
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setCancelOrderId(order._id)}
-                    className=" cursor-pointer
-                      px-6 py-2.5 rounded-xl
-                      bg-red-50 border border-red-200
-                      text-red-600 font-semibold text-sm
-                      hover:bg-red-100 hover:border-red-300
-                      transition-all duration-200
-                      flex items-center gap-2
-                    "
-                  >
-                    <X size={16} />
-                    Cancel Order
-                  </motion.button>
-                )}
+                  {canCancel && (
+                    <motion.button
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setCancelOrderId(order._id)}
+                      className="
+                        cursor-pointer
+                        px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl
+                        bg-red-50 border border-red-200
+                        text-red-600 font-semibold text-xs sm:text-sm
+                        hover:bg-red-100 hover:border-red-300
+                        transition-all duration-200
+                        flex items-center gap-1.5 sm:gap-2
+                      "
+                    >
+                      <X size={14} />
+                      <span className="hidden xs:inline">Cancel Order</span>
+                      <span className="xs:hidden">Cancel</span>
+                    </motion.button>
+                  )}
+                </div>
               </div>
 
               {/* Cancellation Info (if cancelled) */}
-              {order.orderStatus === "CANCELLED" &&
-                order.cancellationReason && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="
-                    mt-4 p-4 rounded-xl
+              {order.orderStatus === "CANCELLED" && order.cancellationReason && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="
+                    mt-4 p-3 sm:p-4 rounded-xl
                     bg-red-50/80 backdrop-blur
                     border border-red-200/50
                   "
-                  >
-                    <p className="text-sm font-semibold text-red-600 mb-1">
-                      Cancellation Reason
+                >
+                  <p className="text-xs sm:text-sm font-semibold text-red-600 mb-1">
+                    Cancellation Reason
+                  </p>
+                  <p className="text-xs sm:text-sm text-red-600/80">
+                    {order.cancellationReason}
+                  </p>
+                  {order.cancelledBy && (
+                    <p className="text-xs text-red-600/60 mt-2">
+                      Cancelled by: {order.cancelledBy}
                     </p>
-                    <p className="text-sm text-red-600/80">
-                      {order.cancellationReason}
-                    </p>
-                    {order.cancelledBy && (
-                      <p className="text-xs text-red-600/60 mt-2">
-                        Cancelled by: {order.cancelledBy}
-                      </p>
-                    )}
-                  </motion.div>
-                )}
+                  )}
+                </motion.div>
+              )}
             </div>
           </motion.div>
         );

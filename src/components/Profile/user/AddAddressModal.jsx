@@ -207,47 +207,47 @@ export default function AddAddressModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed inset-0 z-[102] flex items-center justify-center px-4"
+            className="fixed inset-0 z-[102] flex items-center justify-center px-3 sm:px-4"
           >
             {/* Modal box */}
             <div
               onClick={(e) => e.stopPropagation()}
               className="
                 relative w-full max-w-lg
-                max-h-[85vh] overflow-y-auto
-                rounded-2xl
+                max-h-[90vh] overflow-y-auto
+                rounded-xl sm:rounded-2xl
                 bg-black/80 backdrop-blur-xl
                 border border-white/15
                 shadow-[0_20px_60px_rgba(0,0,0,0.8)]
-                p-6
+                p-4 sm:p-6
               "
             >
               {/* Close */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 text-white/60 hover:text-white cursor-pointer"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 text-white/60 hover:text-white cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} className="sm:w-[18px] sm:h-[18px]" />
               </button>
 
-              <h3 className="text-white text-xl font-semibold mb-6">
+              <h3 className="text-white text-lg sm:text-xl font-semibold mb-4 sm:mb-6 pr-8">
                 {mode === "edit" ? "Edit Address" : "Add New Address"}
               </h3>
 
               {/* FORM */}
-              <div className="grid gap-4">
+              <div className="grid gap-3 sm:gap-4">
                 {/* Full Name */}
                 <div>
-                  <div className="flex items-center justify-between">
-                    <label className="text-white/70 text-sm">Full Name</label>
-                    <label className="flex items-center gap-2 text-xs text-white/60 cursor-pointer">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-white/70 text-xs sm:text-sm">Full Name</label>
+                    <label className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-white/60 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={useProfileName}
                         onChange={handleUseProfileName}
-                        className="accent-white"
+                        className="accent-white w-3 h-3 sm:w-auto sm:h-auto"
                       />
-                      Same as profile
+                      <span className="whitespace-nowrap">Same as profile</span>
                     </label>
                   </div>
 
@@ -257,9 +257,9 @@ export default function AddAddressModal({
                     onChange={handleChange}
                     disabled={useProfileName}
                     className="
-                      mt-1 w-full rounded-xl
+                      w-full rounded-lg sm:rounded-xl
                       bg-black/40 border border-white/15
-                      px-4 py-2 text-white
+                      px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-white
                       outline-none focus:border-white/30
                       disabled:opacity-60
                     "
@@ -268,18 +268,18 @@ export default function AddAddressModal({
 
                 {/* Phone */}
                 <div>
-                  <div className="flex items-center justify-between">
-                    <label className="text-white/70 text-sm">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-white/70 text-xs sm:text-sm">
                       Phone Number
                     </label>
-                    <label className="flex items-center gap-2 text-xs text-white/60 cursor-pointer">
+                    <label className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-white/60 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={useProfilePhone}
                         onChange={handleUseProfilePhone}
-                        className="accent-white"
+                        className="accent-white w-3 h-3 sm:w-auto sm:h-auto"
                       />
-                      Same as profile
+                      <span className="whitespace-nowrap">Same as profile</span>
                     </label>
                   </div>
 
@@ -290,9 +290,9 @@ export default function AddAddressModal({
                     disabled={useProfilePhone}
                     placeholder="+91 XXXXX XXXXX"
                     className="
-                      mt-1 w-full rounded-xl
+                      w-full rounded-lg sm:rounded-xl
                       bg-black/40 border border-white/15
-                      px-4 py-2 text-white
+                      px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-white
                       outline-none focus:border-white/30
                       disabled:opacity-60
                     "
@@ -307,7 +307,7 @@ export default function AddAddressModal({
                   { name: "pincode", label: "Pincode" },
                 ].map((field) => (
                   <div key={field.name}>
-                    <label className="text-white/70 text-sm">
+                    <label className="text-white/70 text-xs sm:text-sm block mb-1">
                       {field.label}
                     </label>
                     <input
@@ -315,9 +315,9 @@ export default function AddAddressModal({
                       value={form[field.name]}
                       onChange={handleChange}
                       className="
-                        mt-1 w-full rounded-xl
+                        w-full rounded-lg sm:rounded-xl
                         bg-black/40 border border-white/15
-                        px-4 py-2 text-white
+                        px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base text-white
                         outline-none focus:border-white/30
                       "
                     />
@@ -326,13 +326,13 @@ export default function AddAddressModal({
               </div>
 
               {/* ACTIONS */}
-              <div className="mt-6 flex justify-end gap-3">
+              <div className="mt-5 sm:mt-6 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
                 <button
                   onClick={onClose}
                   className="
-                    px-5 py-2 rounded-full
+                    px-4 sm:px-5 py-2 sm:py-2.5 rounded-full
                     border border-white/20
-                    text-white text-sm
+                    text-white text-xs sm:text-sm
                     hover:bg-white/10 transition
                     cursor-pointer
                   "
@@ -343,9 +343,9 @@ export default function AddAddressModal({
                 <button
                   onClick={handleSaveAddress}
                   className="
-                    px-6 py-2 rounded-full
+                    px-5 sm:px-6 py-2 sm:py-2.5 rounded-full
                     bg-white text-black
-                    text-sm font-medium
+                    text-xs sm:text-sm font-medium
                     hover:bg-gray-200 transition
                     cursor-pointer
                   "

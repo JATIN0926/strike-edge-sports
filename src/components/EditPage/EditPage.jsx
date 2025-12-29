@@ -49,7 +49,6 @@ export default function EditProduct({ productId }) {
         });
 
         const p = res.data;
-        console.log("data", p);
 
         setForm({
           title: p.title || "",

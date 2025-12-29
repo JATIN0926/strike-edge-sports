@@ -58,7 +58,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4 pointer-events-none">
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -67,15 +67,16 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
               className="
                 w-full max-w-md pointer-events-auto
                 bg-white/90 backdrop-blur-xl
-                rounded-3xl
+                rounded-2xl sm:rounded-3xl
                 shadow-2xl shadow-red-500/10
                 border border-white/50
                 overflow-hidden
+                max-h-[90vh] overflow-y-auto
               "
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header with gradient */}
-              <div className="relative bg-gradient-to-br from-red-50 to-orange-50 p-6 pb-8">
+              <div className="relative bg-gradient-to-br from-red-50 to-orange-50 p-4 sm:p-6 pb-6 sm:pb-8">
                 {/* Close button */}
                 <motion.button
                   whileHover={{ scale: 1.1, rotate: 90 }}
@@ -83,8 +84,8 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                   onClick={handleClose}
                   className="
                     cursor-pointer
-                    absolute top-4 right-4
-                    w-8 h-8 rounded-full
+                    absolute top-3 right-3 sm:top-4 sm:right-4
+                    w-7 h-7 sm:w-8 sm:h-8 rounded-full
                     bg-white/80 backdrop-blur
                     border border-black/5
                     flex items-center justify-center
@@ -92,7 +93,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                     transition-colors
                   "
                 >
-                  <X size={18} />
+                  <X size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </motion.button>
 
                 {/* Icon */}
@@ -101,14 +102,14 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring" }}
                   className="
-                    w-16 h-16 mx-auto mb-4
-                    rounded-2xl
+                    w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4
+                    rounded-xl sm:rounded-2xl
                     bg-gradient-to-br from-red-500 to-orange-500
                     flex items-center justify-center
                     shadow-lg shadow-red-500/30
                   "
                 >
-                  <AlertTriangle className="text-white" size={32} />
+                  <AlertTriangle className="text-white" size={24} strokeWidth={2} />
                 </motion.div>
 
                 {/* Title */}
@@ -116,7 +117,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-2xl font-bold text-center text-black"
+                  className="text-xl sm:text-2xl font-bold text-center text-black"
                 >
                   Cancel Order
                 </motion.h3>
@@ -125,21 +126,21 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.35 }}
-                  className="text-sm text-center text-black/60 mt-2"
+                  className="text-xs sm:text-sm text-center text-black/60 mt-2"
                 >
                   This action cannot be undone. Please select a reason.
                 </motion.p>
               </div>
 
               {/* Content */}
-              <div className="p-6 space-y-4">
+              <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                 {/* Reason Selector */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <label className="block text-sm font-semibold text-black mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-black mb-2">
                     Cancellation Reason
                   </label>
                   <div className="relative">
@@ -147,9 +148,10 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
                       className="
-                        w-full p-3 pr-10 rounded-xl
+                        w-full p-2.5 sm:p-3 pr-10 rounded-xl
                         bg-white/70 backdrop-blur
                         border border-black/10
+                        text-sm sm:text-base
                         focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500/50
                         transition-all duration-200
                         appearance-none
@@ -166,7 +168,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                     {/* Custom dropdown arrow */}
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                       <svg
-                        className="w-5 h-5 text-black/40"
+                        className="w-4 h-4 sm:w-5 sm:h-5 text-black/40"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -191,7 +193,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <label className="block text-sm font-semibold text-black mb-2">
+                      <label className="block text-xs sm:text-sm font-semibold text-black mb-2">
                         Please specify
                       </label>
                       <textarea
@@ -200,9 +202,10 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                         placeholder="Write your reason here..."
                         rows={3}
                         className="
-                          w-full p-3 rounded-xl
+                          w-full p-2.5 sm:p-3 rounded-xl
                           bg-white/70 backdrop-blur
                           border border-black/10
+                          text-sm sm:text-base
                           focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500/50
                           transition-all duration-200
                           resize-none
@@ -217,7 +220,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.45 }}
-                  className="flex gap-3 pt-2"
+                  className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2"
                 >
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -225,10 +228,10 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                     onClick={handleClose}
                     className="
                       cursor-pointer
-                      flex-1 px-5 py-3 rounded-xl
+                      flex-1 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl
                       bg-white/70 backdrop-blur
                       border border-black/10
-                      text-black font-semibold
+                      text-black font-semibold text-sm sm:text-base
                       hover:bg-white hover:border-black/20
                       transition-all duration-200
                     "
@@ -242,9 +245,9 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                     onClick={handleConfirm}
                     className="
                       cursor-pointer
-                      flex-1 px-5 py-3 rounded-xl
+                      flex-1 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl
                       bg-gradient-to-r from-red-600 to-orange-600
-                      text-white font-semibold
+                      text-white font-semibold text-sm sm:text-base
                       shadow-lg shadow-red-500/30
                       hover:shadow-xl hover:shadow-red-500/40
                       disabled:opacity-50 disabled:cursor-not-allowed
@@ -262,14 +265,14 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                   className="
-                    flex items-start gap-2 p-3 rounded-xl
+                    flex items-start gap-2 p-2.5 sm:p-3 rounded-xl
                     bg-amber-50/80 backdrop-blur
                     border border-amber-200/50
                   "
                 >
-                  <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <svg
-                      className="w-3 h-3 text-amber-600"
+                      className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-600"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -280,7 +283,7 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
                       />
                     </svg>
                   </div>
-                  <p className="text-xs text-amber-700">
+                  <p className="text-[10px] sm:text-xs text-amber-700 leading-relaxed">
                     Once cancelled, you cannot undo this action. Make sure you
                     want to proceed.
                   </p>
@@ -293,6 +296,5 @@ export default function CancelOrderModal({ open, onClose, onConfirm }) {
     </AnimatePresence>
   );
 
-  // Portal se render karo - document.body me
   return createPortal(modalContent, document.body);
 }
