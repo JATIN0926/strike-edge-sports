@@ -12,7 +12,7 @@ import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { initAuthListener } from "@/utils/authListener";
-import { setCurrentUser } from "@/redux/slices/userSlice";
+import { setCurrentUser, setShowAuthModal } from "@/redux/slices/userSlice";
 import CategoryDropdown from "./CategoryDropdown";
 
 const navItems = [
@@ -29,8 +29,13 @@ export default function Navbar() {
   const currentUser = useSelector((state) => state.user.currentUser);
   const cartItems = useSelector((state) => state.cart.items);
   const cartCount = Object.keys(cartItems).length;
+  const showAuthModal = useSelector((state) => state.user.showAuthModal);
 
-  const [openAuth, setOpenAuth] = useState(false);
+  const openAuth = showAuthModal;
+
+  const handleOpenAuth = () => dispatch(setShowAuthModal(true));
+  const handleCloseAuth = () => dispatch(setShowAuthModal(false));
+
   const [openProfileMenu, setOpenProfileMenu] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
@@ -111,7 +116,8 @@ export default function Navbar() {
       );
 
       dispatch(setCurrentUser(res.data.user));
-      setOpenAuth(false);
+
+      handleCloseAuth();
     } catch {
       toast.error("Google sign-in failed", { id: "google-auth" });
     }
@@ -286,7 +292,7 @@ export default function Navbar() {
               </div>
             ) : (
               <button
-                onClick={() => setOpenAuth(true)}
+                onClick={handleOpenAuth}
                 className="
                   cursor-pointer
                   hidden sm:block px-4 py-2 text-sm rounded-full
@@ -496,7 +502,7 @@ export default function Navbar() {
                   ) : (
                     <button
                       onClick={() => {
-                        setOpenAuth(true);
+                        handleOpenAuth();
                         setMobileMenu(false);
                       }}
                       className="
@@ -521,7 +527,7 @@ export default function Navbar() {
 
       <AuthModal
         open={openAuth}
-        onClose={() => setOpenAuth(false)}
+        onClose={handleCloseAuth}
         onGoogleSignIn={handleGoogleSignIn}
       />
     </>

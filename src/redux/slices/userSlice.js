@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   currentUser: null,
-  authChecked: false, // 👈 REQUIRED
+  authChecked: false,
+  showAuthModal: false,
 };
 
 const userSlice = createSlice({
@@ -36,6 +37,9 @@ const userSlice = createSlice({
         state.currentUser.savedProducts = [...saved, productId];
       }
     },
+    setShowAuthModal: (state, action) => {
+      state.showAuthModal = action.payload;
+    },
   },
 });
 
@@ -44,6 +48,7 @@ export const {
   logoutUser,
   setAuthChecked,
   toggleSavedProduct,
+  setShowAuthModal,
 } = userSlice.actions;
 
 export default userSlice.reducer;

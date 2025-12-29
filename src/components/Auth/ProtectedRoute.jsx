@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import AppLoader from "@/components/Loader/AppLoader";
+import { setShowAuthModal } from "@/redux/slices/userSlice";
 
 export default function ProtectedRoute({ children }) {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { currentUser, authChecked } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -18,9 +20,11 @@ export default function ProtectedRoute({ children }) {
         id: "auth-required",
       });
 
+      dispatch(setShowAuthModal(true)); 
+
       router.replace("/");
     }
-  }, [currentUser, authChecked, router]);
+  }, [currentUser, authChecked, router,dispatch]);
 
   if (!authChecked) {
     return <AppLoader text="Checking authentication…" />;
