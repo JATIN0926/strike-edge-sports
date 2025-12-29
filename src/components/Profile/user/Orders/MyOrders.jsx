@@ -4,8 +4,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
-import { Package, Calendar, CreditCard, MapPin, X, ArrowRight } from "lucide-react";
-import Link from "next/link"
+import {
+  Package,
+  Calendar,
+  CreditCard,
+  MapPin,
+  X,
+  ArrowRight,
+} from "lucide-react";
+import Link from "next/link";
 import OrderStatusBadge from "./OrderStatusBadge";
 import CancelOrderModal from "./CancelOrderModal";
 import AppLoader from "@/components/Loader/AppLoader";
@@ -72,8 +79,12 @@ export default function MyOrders() {
         "
       >
         <div className="text-4xl sm:text-6xl mb-4">🛒</div>
-        <h3 className="text-lg sm:text-xl font-bold text-black">No orders yet</h3>
-        <p className="text-sm sm:text-base text-black/60">Start shopping to see your orders here!</p>
+        <h3 className="text-lg sm:text-xl font-bold text-black">
+          No orders yet
+        </h3>
+        <p className="text-sm sm:text-base text-black/60">
+          Start shopping to see your orders here!
+        </p>
         <Link href="/products">
           <motion.button
             whileHover={{ scale: 1.05, x: 5 }}
@@ -93,9 +104,9 @@ export default function MyOrders() {
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
             <span className="relative">Start Shopping</span>
-            <ArrowRight 
-              size={18} 
-              className="relative group-hover:translate-x-1 transition-transform duration-300" 
+            <ArrowRight
+              size={18}
+              className="relative group-hover:translate-x-1 transition-transform duration-300"
               strokeWidth={2.5}
             />
           </motion.button>
@@ -107,7 +118,9 @@ export default function MyOrders() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {orders.map((order, index) => {
-        const canCancel = ["PLACED", "CONFIRMED"].includes(order.orderStatus);
+        const canCancel = !["DELIVERED", "CANCELLED"].includes(
+          order.orderStatus
+        );
         const isExpanded = expandedOrder === order._id;
 
         return (
@@ -238,11 +251,13 @@ export default function MyOrders() {
               {/* Payment & Shipping Info */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-5">
                 {/* Payment Method */}
-                <div className="
+                <div
+                  className="
                   flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl
                   bg-gradient-to-br from-emerald-50/80 to-blue-50/80
                   backdrop-blur border border-white/50
-                ">
+                "
+                >
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
                     <CreditCard className="text-emerald-600" size={14} />
                   </div>
@@ -255,18 +270,21 @@ export default function MyOrders() {
                 </div>
 
                 {/* Shipping Address */}
-                <div className="
+                <div
+                  className="
                   flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl
                   bg-gradient-to-br from-blue-50/80 to-emerald-50/80
                   backdrop-blur border border-white/50
-                ">
+                "
+                >
                   <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
                     <MapPin className="text-blue-600" size={14} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-black/60">Deliver to</p>
                     <p className="text-xs sm:text-sm font-semibold text-black truncate">
-                      {order.shippingAddress.city}, {order.shippingAddress.state}
+                      {order.shippingAddress.city},{" "}
+                      {order.shippingAddress.state}
                     </p>
                   </div>
                 </div>
@@ -276,7 +294,9 @@ export default function MyOrders() {
               <div className="flex flex-col gap-3 sm:gap-4 pt-4 sm:pt-5 border-t border-black/5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs sm:text-sm text-black/60">Total Amount</p>
+                    <p className="text-xs sm:text-sm text-black/60">
+                      Total Amount
+                    </p>
                     <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
                       ₹{order.totalAmount}
                     </p>
@@ -306,29 +326,30 @@ export default function MyOrders() {
               </div>
 
               {/* Cancellation Info (if cancelled) */}
-              {order.orderStatus === "CANCELLED" && order.cancellationReason && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  className="
+              {order.orderStatus === "CANCELLED" &&
+                order.cancellationReason && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="
                     mt-4 p-3 sm:p-4 rounded-xl
                     bg-red-50/80 backdrop-blur
                     border border-red-200/50
                   "
-                >
-                  <p className="text-xs sm:text-sm font-semibold text-red-600 mb-1">
-                    Cancellation Reason
-                  </p>
-                  <p className="text-xs sm:text-sm text-red-600/80">
-                    {order.cancellationReason}
-                  </p>
-                  {order.cancelledBy && (
-                    <p className="text-xs text-red-600/60 mt-2">
-                      Cancelled by: {order.cancelledBy}
+                  >
+                    <p className="text-xs sm:text-sm font-semibold text-red-600 mb-1">
+                      Cancellation Reason
                     </p>
-                  )}
-                </motion.div>
-              )}
+                    <p className="text-xs sm:text-sm text-red-600/80">
+                      {order.cancellationReason}
+                    </p>
+                    {order.cancelledBy && (
+                      <p className="text-xs text-red-600/60 mt-2">
+                        Cancelled by: {order.cancelledBy}
+                      </p>
+                    )}
+                  </motion.div>
+                )}
             </div>
           </motion.div>
         );
