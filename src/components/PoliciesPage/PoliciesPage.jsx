@@ -1,7 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Truck, RefreshCw, Headphones, XCircle, Clock, Phone, Mail, MapPin } from "lucide-react";
+import {
+  Truck,
+  RefreshCw,
+  Headphones,
+  XCircle,
+  Clock,
+  Phone,
+  Mail,
+  MapPin,
+} from "lucide-react";
 
 export default function PoliciesPage() {
   const policies = [
@@ -12,9 +21,18 @@ export default function PoliciesPage() {
       items: [
         { label: "Processing Time", value: "1–2 business days" },
         { label: "Delivery Time", value: "5–8 days PAN India" },
-        { label: "Courier Partners", value: "DTDC, Delhivery (subject to change)" },
-        { label: "Possible Delays", value: "Weather, strikes, or remote areas" },
-        { label: "Compensation", value: "Company will compensate for major delays" },
+        {
+          label: "Courier Partners",
+          value: "DTDC, Delhivery (subject to change)",
+        },
+        {
+          label: "Possible Delays",
+          value: "Weather, strikes, or remote areas",
+        },
+        {
+          label: "Compensation",
+          value: "Company will compensate for major delays",
+        },
       ],
     },
     {
@@ -23,10 +41,16 @@ export default function PoliciesPage() {
       color: "blue",
       items: [
         { label: "Return Window", value: "3/5/7 days after delivery" },
-        { label: "Return Conditions", value: "Unused, original packaging, manufacturing defect" },
+        {
+          label: "Return Conditions",
+          value: "Unused, original packaging, manufacturing defect",
+        },
         { label: "Refund Method", value: "Original payment method" },
         { label: "Refund Timeline", value: "7–10 working days" },
-        { label: "Replacement", value: "Available if damaged or wrong item received" },
+        {
+          label: "Replacement",
+          value: "Available if damaged or wrong item received",
+        },
       ],
     },
     {
@@ -34,8 +58,16 @@ export default function PoliciesPage() {
       title: "Customer Support Policy",
       color: "purple",
       items: [
-        { label: "WhatsApp", value: "+91 8923765865", link: "https://wa.me/918923765865" },
-        { label: "Email", value: "strikedge10@gmail.com", link: "mailto:strikedge10@gmail.com" },
+        {
+          label: "WhatsApp",
+          value: "+91 8923765865",
+          link: "https://wa.me/918923765865",
+        },
+        {
+          label: "Email",
+          value: "strikedge10@gmail.com",
+          link: "mailto:strikedge10@gmail.com",
+        },
         { label: "Working Hours", value: "9 AM to 6 PM (Monday to Saturday)" },
         { label: "Response Time", value: "Within 24–48 hours" },
       ],
@@ -46,7 +78,10 @@ export default function PoliciesPage() {
       color: "red",
       items: [
         { label: "Cancellation Time", value: "Before dispatch only" },
-        { label: "How to Cancel", value: "Through Website or WhatsApp or Email" },
+        {
+          label: "How to Cancel",
+          value: "Through Website or WhatsApp or Email",
+        },
         { label: "Refund Timeline", value: "24–48 hours after cancellation" },
       ],
     },
@@ -80,11 +115,11 @@ export default function PoliciesPage() {
   };
 
   return (
-    <div className=" mt-16 bg-gradient-to-b from-white via-slate-50/30 to-white">
+    <div className=" mt-16 bg-linear-to-b from-white via-slate-50/30 to-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-black/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-white to-blue-50/30" />
-        
+        <div className="absolute inset-0 bg-linear-to-br from-emerald-50/50 via-white to-blue-50/30" />
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -106,18 +141,19 @@ export default function PoliciesPage() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-black mb-6 leading-tight">
               Terms &{" "}
-              <span className="bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
                 Policies
               </span>
             </h1>
 
             <p className="text-base sm:text-lg lg:text-xl text-black/70 leading-relaxed max-w-3xl mx-auto">
-              Your trust matters to us. Read our transparent policies to understand how we serve you better.
+              Your trust matters to us. Read our transparent policies to
+              understand how we serve you better.
             </p>
           </motion.div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-200 to-transparent" />
       </section>
 
       {/* Policies Grid */}
@@ -126,7 +162,7 @@ export default function PoliciesPage() {
           {policies.map((policy, index) => {
             const Icon = policy.icon;
             const colors = colorClasses[policy.color];
-            
+
             return (
               <motion.div
                 key={index}
@@ -139,10 +175,15 @@ export default function PoliciesPage() {
                 <div className="relative h-full p-6 sm:p-8 rounded-2xl bg-white border border-black/5 hover:border-black/10 transition-all duration-300 hover:shadow-xl hover:shadow-black/5">
                   {/* Header */}
                   <div className="flex items-start gap-4 mb-6">
-                    <div className={`flex-shrink-0 p-3 sm:p-3.5 rounded-xl bg-gradient-to-br ${colors.bg} border ${colors.border} group-hover:scale-110 transition-transform duration-300`}>
-                      <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${colors.icon}`} strokeWidth={2} />
+                    <div
+                      className={`shrink-0 p-3 sm:p-3.5 rounded-xl bg-linear-to-br ${colors.bg} border ${colors.border} group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <Icon
+                        className={`w-5 h-5 sm:w-6 sm:h-6 ${colors.icon}`}
+                        strokeWidth={2}
+                      />
                     </div>
-                    
+
                     <h2 className="flex-1 text-xl sm:text-2xl font-bold text-black leading-tight">
                       {policy.title}
                     </h2>
@@ -151,8 +192,11 @@ export default function PoliciesPage() {
                   {/* Items */}
                   <div className="space-y-4">
                     {policy.items.map((item, idx) => (
-                      <div key={idx} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3">
-                        <div className="flex-shrink-0 w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-green-500 mt-1.5 sm:mt-2" />
+                      <div
+                        key={idx}
+                        className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3"
+                      >
+                        <div className="shrink-0 w-2 h-2 rounded-full bg-linear-to-r from-emerald-500 to-green-500 mt-1.5 sm:mt-2" />
                         <div className="flex-1 min-w-0">
                           <span className="text-sm sm:text-base font-semibold text-black/80">
                             {item.label}:
@@ -177,7 +221,9 @@ export default function PoliciesPage() {
                   </div>
 
                   {/* Hover effect */}
-                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${colors.hover} transition-all duration-500 pointer-events-none`} />
+                  <div
+                    className={`absolute inset-0 rounded-2xl bg-linear-to-br ${colors.hover} transition-all duration-500 pointer-events-none`}
+                  />
                 </div>
               </motion.div>
             );
@@ -186,7 +232,7 @@ export default function PoliciesPage() {
       </section>
 
       {/* Contact CTA */}
-      <section className="border-t border-black/5 bg-gradient-to-b from-white to-slate-50/50">
+      <section className="border-t border-black/5 bg-linear-to-b from-white to-slate-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -199,21 +245,22 @@ export default function PoliciesPage() {
               Still Have Questions?
             </h2>
             <p className="text-sm sm:text-base lg:text-lg text-black/70 mb-8">
-              Our team is here to help. Reach out via WhatsApp or email for quick assistance.
+              Our team is here to help. Reach out via WhatsApp or email for
+              quick assistance.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <motion.a
                 href="https://wa.me/918923765865"
                 target="_blank"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white text-sm sm:text-base font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/35 transition-all duration-300"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-xl bg-linear-to-r from-emerald-500 to-green-600 text-white text-sm sm:text-base font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/35 transition-all duration-300"
               >
                 <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                 WhatsApp Us
               </motion.a>
-              
+
               <motion.a
                 href="mailto:strikedge10@gmail.com"
                 whileHover={{ scale: 1.05 }}
