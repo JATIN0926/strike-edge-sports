@@ -44,8 +44,9 @@ export default function Navbar() {
   const [showCategories, setShowCategories] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [mobileCategories, setMobileCategories] = useState(false);
-
   const [categories, setCategories] = useState([]);
+  const [debugLog, setDebugLog] = useState([]);
+  const addLog = (msg) => setDebugLog((p) => [...p, msg]);
 
   useEffect(() => {
     initAuthListener(dispatch);
@@ -93,14 +94,22 @@ export default function Navbar() {
 
   useEffect(() => {
     const checkRedirect = async () => {
+      addLog("🔄 Checking redirect result...");
+
       try {
         const result = await getRedirectResult(auth);
-        if (!result) return;
 
-        toast.loading("Finalizing login...", { id: "google-auth" });
+        if (!result) {
+          addLog("ℹ️ No redirect result found");
+          return;
+        }
+
+        addLog("✅ Redirect result received");
 
         const user = result.user;
         const token = await user.getIdToken();
+
+        addLog("📨 Sending token to backend...");
 
         await axios.post(
           `/api/auth/google`,
@@ -113,15 +122,21 @@ export default function Navbar() {
           { withCredentials: true }
         );
 
+        addLog("👤 Fetching user profile...");
+
         const res = await axios.get(`/api/user/me`, {
           withCredentials: true,
         });
 
         dispatch(setCurrentUser(res.data.user));
 
+        addLog("🎉 SUCCESS — logged in");
+
         toast.success("Logged in successfully 🎉", { id: "google-auth" });
         handleCloseAuth();
-      } catch (err) {
+      } catch (e) {
+        addLog("❌ ERROR in redirect handler");
+        addLog(e?.message || "unknown error");
         toast.error("Google sign-in failed", { id: "google-auth" });
       }
     };
@@ -569,6 +584,21 @@ export default function Navbar() {
         onClose={handleCloseAuth}
         onGoogleSignIn={handleGoogleSignIn}
       />
+      <div
+        style={{
+          position: "fixed",
+          bottom: 10,
+          left: 10,
+          fontSize: 10,
+          background: "#0003",
+          padding: 6,
+          color: "#000",
+        }}
+      >
+        {debugLog.map((l, i) => (
+          <div key={i}>{l}</div>
+        ))}
+      </div>
     </>
   );
 }
