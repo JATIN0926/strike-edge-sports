@@ -25,10 +25,6 @@ const navItems = [
   { label: "Contact Us", type: "scroll", target: "contact" },
 ];
 
-const isIOS =
-  typeof window !== "undefined" &&
-  /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
 export default function Navbar() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -96,9 +92,12 @@ export default function Navbar() {
   }, [openProfileMenu]);
 
   useEffect(() => {
-    getRedirectResult(auth)
-      .then(async (result) => {
+    const checkRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
         if (!result) return;
+
+        toast.loading("Finalizing login...", { id: "google-auth" });
 
         const user = result.user;
         const token = await user.getIdToken();
@@ -114,29 +113,33 @@ export default function Navbar() {
           { withCredentials: true }
         );
 
-        const res = await axios.get(`/api/user/me`, { withCredentials: true });
+        const res = await axios.get(`/api/user/me`, {
+          withCredentials: true,
+        });
 
         dispatch(setCurrentUser(res.data.user));
 
         toast.success("Logged in successfully 🎉", { id: "google-auth" });
         handleCloseAuth();
-      })
-      .catch(() => {
+      } catch (err) {
         toast.error("Google sign-in failed", { id: "google-auth" });
-      });
+      }
+    };
+
+    checkRedirect();
   }, []);
 
   const handleGoogleSignIn = async () => {
     try {
       toast.loading("Signing you in...", { id: "google-auth" });
 
-      // iPhone / iPad → USE REDIRECT
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
       if (isIOS) {
         await signInWithRedirect(auth, googleProvider);
         return;
       }
 
-      // Other browsers → POPUP
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       const token = await user.getIdToken();
