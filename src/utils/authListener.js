@@ -22,6 +22,7 @@ export const initAuthListener = (dispatch) => {
 
       dispatch(setCurrentUser(res.data.user));
     } catch (err) {
+      console.log(err);
       console.log("Auth listener error:", err?.response?.status);
 
       dispatch(logoutUser());

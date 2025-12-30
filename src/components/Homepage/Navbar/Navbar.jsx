@@ -3,7 +3,11 @@
 import AuthModal from "@/components/Auth/AuthModal";
 import { auth, googleProvider } from "@/utils/firebase";
 import axios from "axios";
-import { signInWithPopup } from "firebase/auth";
+import {
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+} from "firebase/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -20,6 +24,10 @@ const navItems = [
   { label: "Shop", type: "route", href: "/products" },
   { label: "Contact Us", type: "scroll", target: "contact" },
 ];
+
+const isIOS =
+  typeof window !== "undefined" &&
+  /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 export default function Navbar() {
   const router = useRouter();
@@ -89,10 +97,51 @@ export default function Navbar() {
     };
   }, [openProfileMenu]);
 
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (!result) return;
+
+        const user = result.user;
+        const token = await user.getIdToken();
+
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`,
+          {
+            name: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+            token,
+          },
+          { withCredentials: true }
+        );
+
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
+          { withCredentials: true }
+        );
+
+        dispatch(setCurrentUser(res.data.user));
+
+        toast.success("Logged in successfully 🎉", { id: "google-auth" });
+        handleCloseAuth();
+      })
+      .catch(() => {
+        toast.error("Google sign-in failed", { id: "google-auth" });
+      });
+  }, []);
+
   const handleGoogleSignIn = async () => {
     try {
       toast.loading("Signing you in...", { id: "google-auth" });
 
+      // iPhone / iPad → USE REDIRECT
+      if (isIOS) {
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
+
+      // Other browsers → POPUP
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       const token = await user.getIdToken();
@@ -108,8 +157,6 @@ export default function Navbar() {
         { withCredentials: true }
       );
 
-      toast.success("Logged in successfully 🎉", { id: "google-auth" });
-
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
         { withCredentials: true }
@@ -117,11 +164,12 @@ export default function Navbar() {
 
       dispatch(setCurrentUser(res.data.user));
 
+      toast.success("Logged in successfully 🎉", { id: "google-auth" });
       handleCloseAuth();
     } catch {
       toast.error("Google sign-in failed", { id: "google-auth" });
     }
-  };
+  };  
 
   const handleLogout = async () => {
     try {
