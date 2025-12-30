@@ -93,23 +93,11 @@ export default function Navbar() {
   }, [openProfileMenu]);
 
   useEffect(() => {
-    const checkRedirect = async () => {
-      addLog("🔄 Checking redirect result...");
+    const unsub = auth.onAuthStateChanged(async (user) => {
+      if (!user) return;
 
       try {
-        const result = await getRedirectResult(auth);
-
-        if (!result) {
-          addLog("ℹ️ No redirect result found");
-          return;
-        }
-
-        addLog("✅ Redirect result received");
-
-        const user = result.user;
         const token = await user.getIdToken();
-
-        addLog("📨 Sending token to backend...");
 
         await axios.post(
           `/api/auth/google`,
@@ -122,63 +110,33 @@ export default function Navbar() {
           { withCredentials: true }
         );
 
-        addLog("👤 Fetching user profile...");
-
         const res = await axios.get(`/api/user/me`, {
           withCredentials: true,
         });
 
         dispatch(setCurrentUser(res.data.user));
 
-        addLog("🎉 SUCCESS — logged in");
-
         toast.success("Logged in successfully 🎉", { id: "google-auth" });
         handleCloseAuth();
-      } catch (e) {
-        addLog("❌ ERROR in redirect handler");
-        addLog(e?.message || "unknown error");
-        toast.error("Google sign-in failed", { id: "google-auth" });
+      } catch (err) {
+        toast.error("Session sync failed");
       }
-    };
+    });
 
-    checkRedirect();
+    return () => unsub();
   }, []);
 
   const handleGoogleSignIn = async () => {
-    try {
-      toast.loading("Signing you in...", { id: "google-auth" });
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    toast.loading("Signing you in...", { id: "google-auth" });
 
-      if (isIOS) {
-        await signInWithRedirect(auth, googleProvider);
-        return;
-      }
-
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      const token = await user.getIdToken();
-
-      await axios.post(
-        `/api/auth/google`,
-        {
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          token,
-        },
-        { withCredentials: true }
-      );
-
-      const res = await axios.get(`/api/user/me`, { withCredentials: true });
-
-      dispatch(setCurrentUser(res.data.user));
-
-      toast.success("Logged in successfully 🎉", { id: "google-auth" });
-      handleCloseAuth();
-    } catch {
-      toast.error("Google sign-in failed", { id: "google-auth" });
+    if (isIOS) {
+      await signInWithRedirect(auth, googleProvider);
+      return;
     }
+
+    await signInWithPopup(auth, googleProvider);
   };
 
   const handleLogout = async () => {
