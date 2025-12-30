@@ -157,17 +157,13 @@ export default function AddAddressModal({
       let res;
 
       if (mode === "edit") {
-        res = await axios.put(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user/address/${initialData._id}`,
-          form,
-          { withCredentials: true }
-        );
+        res = await axios.put(`/api/user/address/${initialData._id}`, form, {
+          withCredentials: true,
+        });
       } else {
-        res = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user/address`,
-          form,
-          { withCredentials: true }
-        );
+        res = await axios.post(`/api/user/address`, form, {
+          withCredentials: true,
+        });
       }
 
       dispatch(setCurrentUser(res.data.user));
@@ -239,7 +235,9 @@ export default function AddAddressModal({
                 {/* Full Name */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-white/70 text-xs sm:text-sm">Full Name</label>
+                    <label className="text-white/70 text-xs sm:text-sm">
+                      Full Name
+                    </label>
                     <label className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-white/60 cursor-pointer">
                       <input
                         type="checkbox"

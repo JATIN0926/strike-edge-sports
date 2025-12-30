@@ -19,7 +19,8 @@ export default function ProductCard({ product }) {
 
   const cartItem = useSelector((state) => state.cart.items[product._id]);
 
-  const isOutOfStock = product.stock === 0 || (cartItem && cartItem.quantity >= product.stock);
+  const isOutOfStock =
+    product.stock === 0 || (cartItem && cartItem.quantity >= product.stock);
 
   const handleAdd = (e) => {
     e.stopPropagation();
@@ -65,7 +66,7 @@ export default function ProductCard({ product }) {
 
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/products/saved/${product._id}`,
+        `/api/products/saved/${product._id}`,
         {},
         { withCredentials: true }
       );

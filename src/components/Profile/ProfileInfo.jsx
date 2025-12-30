@@ -58,7 +58,7 @@ export default function ProfileInfo() {
       toast.loading("Saving changes...", { id: "profile-save" });
 
       const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/profile`,
+        `/api/user/profile`,
         { name: name.trim(), phone },
         { withCredentials: true }
       );
@@ -77,10 +77,7 @@ export default function ProfileInfo() {
 
   const fetchLatestUser = async () => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
-        { withCredentials: true }
-      );
+      const res = await axios.get(`/api/user/me`, { withCredentials: true });
 
       dispatch(setCurrentUser(res.data.user));
     } catch (err) {
@@ -94,10 +91,9 @@ export default function ProfileInfo() {
     try {
       toast.loading("Deleting address...", { id: "delete-address" });
 
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/address/${addressToDelete._id}`,
-        { withCredentials: true }
-      );
+      await axios.delete(`/api/user/address/${addressToDelete._id}`, {
+        withCredentials: true,
+      });
 
       toast.success("Address deleted", { id: "delete-address" });
 
@@ -117,7 +113,7 @@ export default function ProfileInfo() {
       toast.loading("Updating default address...", { id: "default-address" });
 
       const res = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/address/${addressId}/default`,
+        `/api/user/address/${addressId}/default`,
         {},
         { withCredentials: true }
       );

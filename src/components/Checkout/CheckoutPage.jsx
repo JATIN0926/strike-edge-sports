@@ -112,11 +112,9 @@ export default function CheckoutPage() {
     try {
       toast.loading("Placing your order...", { id: "place-order" });
 
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/orders`,
-        payload,
-        { withCredentials: true }
-      );
+      const res = await axios.post(`/api/orders`, payload, {
+        withCredentials: true,
+      });
 
       toast.success("Order placed successfully 🎉", { id: "place-order" });
 
@@ -124,7 +122,6 @@ export default function CheckoutPage() {
       setTimeout(() => {
         dispatch(clearCart());
       }, 500);
-
     } catch (err) {
       setIsPlacingOrder(false);
       console.log(err);
@@ -142,7 +139,9 @@ export default function CheckoutPage() {
           {/* ---------- Address Section ---------- */}
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-5">
-              <h2 className="text-xl sm:text-2xl font-bold">Delivery Address</h2>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                Delivery Address
+              </h2>
 
               <button
                 onClick={() => {
@@ -207,11 +206,15 @@ export default function CheckoutPage() {
                           </p>
 
                           <p className="text-xs sm:text-sm text-black/60 mt-1 leading-relaxed">
-                            {addr.street}, {addr.city}, {addr.state} – {addr.pincode}
+                            {addr.street}, {addr.city}, {addr.state} –{" "}
+                            {addr.pincode}
                           </p>
 
                           <p className="mt-2 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-black/70">
-                            <Phone size={12} className="sm:w-[14px] sm:h-[14px] text-emerald-500" />
+                            <Phone
+                              size={12}
+                              className="sm:w-[14px] sm:h-[14px] text-emerald-500"
+                            />
                             {addr.phone}
                           </p>
 
@@ -276,7 +279,9 @@ export default function CheckoutPage() {
 
           {/* ---------- Order Summary ---------- */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-5">Order Summary</h2>
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-5">
+              Order Summary
+            </h2>
 
             <div className="space-y-3 sm:space-y-4">
               {cartArray.map((item) => (
@@ -296,7 +301,9 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm sm:text-base line-clamp-2">{item.title}</p>
+                    <p className="font-semibold text-sm sm:text-base line-clamp-2">
+                      {item.title}
+                    </p>
                     <p className="text-xs sm:text-sm text-black/60 mt-0.5 sm:mt-1">
                       Quantity: {item.quantity}
                     </p>
@@ -363,7 +370,9 @@ export default function CheckoutPage() {
                 className="accent-emerald-600 mt-0.5 sm:mt-0 flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm font-medium">Cash on Delivery</p>
+                <p className="text-xs sm:text-sm font-medium">
+                  Cash on Delivery
+                </p>
                 <p className="text-[10px] sm:text-xs text-black/60 mt-0.5">
                   Pay when the product is delivered
                 </p>

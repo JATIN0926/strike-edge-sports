@@ -15,10 +15,7 @@ export const initAuthListener = (dispatch) => {
         return;
       }
 
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
-        { withCredentials: true }
-      );
+      const res = await axios.get(`/api/user/me`, { withCredentials: true });
 
       dispatch(setCurrentUser(res.data.user));
     } catch (err) {

@@ -58,9 +58,7 @@ export default function Navbar() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/categories`
-        );
+        const res = await axios.get(`/api/categories`);
         setCategories(res.data.categories || []);
       } catch {}
     };
@@ -106,7 +104,7 @@ export default function Navbar() {
         const token = await user.getIdToken();
 
         await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`,
+          `/api/auth/google`,
           {
             name: user.displayName,
             email: user.email,
@@ -116,10 +114,7 @@ export default function Navbar() {
           { withCredentials: true }
         );
 
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
-          { withCredentials: true }
-        );
+        const res = await axios.get(`/api/user/me`, { withCredentials: true });
 
         dispatch(setCurrentUser(res.data.user));
 
@@ -147,7 +142,7 @@ export default function Navbar() {
       const token = await user.getIdToken();
 
       await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`,
+        `/api/auth/google`,
         {
           name: user.displayName,
           email: user.email,
@@ -157,10 +152,7 @@ export default function Navbar() {
         { withCredentials: true }
       );
 
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/me`,
-        { withCredentials: true }
-      );
+      const res = await axios.get(`/api/user/me`, { withCredentials: true });
 
       dispatch(setCurrentUser(res.data.user));
 
@@ -169,16 +161,12 @@ export default function Navbar() {
     } catch {
       toast.error("Google sign-in failed", { id: "google-auth" });
     }
-  };  
+  };
 
   const handleLogout = async () => {
     try {
       await auth.signOut();
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`,
-        {},
-        { withCredentials: true }
-      );
+      await axios.post(`/api/auth/logout`, {}, { withCredentials: true });
       toast.success("Logged out successfully");
       setOpenProfileMenu(false);
     } catch {

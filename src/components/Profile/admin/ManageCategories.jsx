@@ -7,14 +7,18 @@ import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { Pencil, Trash2, Check, X, AlertTriangle } from "lucide-react";
 
-const API = `${process.env.NEXT_PUBLIC_API_URL}/api/categories`;
+const API = `/api/categories`;
 
 export default function ManageCategories() {
   const [name, setName] = useState("");
   const [categories, setCategories] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
-  const [deleteModal, setDeleteModal] = useState({ open: false, id: null, name: "" });
+  const [deleteModal, setDeleteModal] = useState({
+    open: false,
+    id: null,
+    name: "",
+  });
   const [deleting, setDeleting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -167,7 +171,11 @@ export default function ManageCategories() {
                       shadow-lg shadow-red-500/30
                     "
                   >
-                    <Trash2 className="text-white" size={32} strokeWidth={2.5} />
+                    <Trash2
+                      className="text-white"
+                      size={32}
+                      strokeWidth={2.5}
+                    />
                   </motion.div>
 
                   {/* Title */}
@@ -223,10 +231,15 @@ export default function ManageCategories() {
                     "
                   >
                     <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <AlertTriangle className="text-amber-600" size={16} strokeWidth={2.5} />
+                      <AlertTriangle
+                        className="text-amber-600"
+                        size={16}
+                        strokeWidth={2.5}
+                      />
                     </div>
                     <p className="text-xs text-amber-700 leading-relaxed">
-                      Deleting this category will affect all products associated with it. Make sure you want to proceed.
+                      Deleting this category will affect all products associated
+                      with it. Make sure you want to proceed.
                     </p>
                   </motion.div>
 
@@ -277,7 +290,11 @@ export default function ManageCategories() {
                         <>
                           <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            transition={{
+                              duration: 1,
+                              repeat: Infinity,
+                              ease: "linear",
+                            }}
                             className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                           />
                           <span>Deleting...</span>
