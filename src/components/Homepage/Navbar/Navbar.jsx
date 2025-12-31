@@ -157,6 +157,29 @@ export default function Navbar() {
     } catch {}
   }, []);
 
+  useEffect(() => {
+    const checkRedirect = async () => {
+      addLog("🔄 Checking Firebase redirect result...");
+
+      try {
+        const result = await getRedirectResult(auth);
+
+        if (!result) {
+          addLog("ℹ️ No redirect result found");
+          return;
+        }
+
+        addLog("✅ Redirect result received");
+        addLog("📧 " + result.user.email);
+      } catch (err) {
+        addLog("❌ Redirect error");
+        addLog(err?.message || JSON.stringify(err));
+      }
+    };
+
+    checkRedirect();
+  }, []);
+
   const handleGoogleSignIn = async () => {
     const ua = navigator.userAgent;
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
