@@ -111,14 +111,13 @@ export default function Navbar() {
         return;
       }
 
-      addLog("🎯 Firebase user detected");
-      addLog("📧 " + user.email);
+      addLog("🎉 Firebase user detected: " + user.email);
 
       try {
         const token = await user.getIdToken();
-        addLog("🔐 Got Firebase token");
 
-        addLog("📨 Calling /api/auth/google...");
+        addLog("🔑 Got ID token, syncing backend...");
+
         await axios.post(
           `/api/auth/google`,
           {
@@ -130,19 +129,17 @@ export default function Navbar() {
           { withCredentials: true }
         );
 
-        addLog("👤 Fetching /api/user/me...");
         const res = await axios.get(`/api/user/me`, {
           withCredentials: true,
         });
 
         dispatch(setCurrentUser(res.data.user));
 
-        addLog("🎉 LOGIN SUCCESS");
         toast.success("Logged in successfully 🎉", { id: "google-auth" });
+
         handleCloseAuth();
-      } catch (err) {
-        addLog("❌ ERROR syncing with backend");
-        addLog(err?.message || JSON.stringify(err));
+      } catch (e) {
+        addLog("❌ Backend sync failed");
         toast.error("Session sync failed");
       }
     });
@@ -158,26 +155,19 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const checkRedirect = async () => {
-      addLog("🔄 Checking Firebase redirect result...");
+    addLog("🚀 Checking redirect result...");
 
-      try {
-        const result = await getRedirectResult(auth);
-
-        if (!result) {
-          addLog("ℹ️ No redirect result found");
-          return;
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) {
+          addLog("🎯 Redirect returned user: " + result.user.email);
+        } else {
+          addLog("ℹ️ No redirect user found");
         }
-
-        addLog("✅ Redirect result received");
-        addLog("📧 " + result.user.email);
-      } catch (err) {
-        addLog("❌ Redirect error");
-        addLog(err?.message || JSON.stringify(err));
-      }
-    };
-
-    checkRedirect();
+      })
+      .catch((err) => {
+        addLog("❌ redirect error: " + err.message);
+      });
   }, []);
 
   const handleGoogleSignIn = async () => {
