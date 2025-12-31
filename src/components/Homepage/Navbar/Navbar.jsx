@@ -6,7 +6,6 @@ import axios from "axios";
 import {
   signInWithPopup,
   signInWithRedirect,
-  getRedirectResult,
 } from "firebase/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Menu, X, ChevronDown } from "lucide-react";
@@ -45,18 +44,6 @@ export default function Navbar() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [mobileCategories, setMobileCategories] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [debugLog, setDebugLog] = useState([]);
-  const addLog = (msg) => {
-    console.log("🔍 LOG:", msg);
-
-    setDebugLog((p) => [...p, msg]);
-
-    try {
-      const old = JSON.parse(localStorage.getItem("authDebug")) || [];
-      old.push(msg);
-      localStorage.setItem("authDebug", JSON.stringify(old));
-    } catch {}
-  };
 
   useEffect(() => {
     initAuthListener(dispatch);
@@ -103,20 +90,14 @@ export default function Navbar() {
   }, [openProfileMenu]);
 
   useEffect(() => {
-    addLog("👀 Setting up Firebase auth observer...");
 
     const unsub = auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        addLog("🙅 No Firebase user found after auth change");
         return;
       }
 
-      addLog("🎉 Firebase user detected: " + user.email);
-
       try {
         const token = await user.getIdToken();
-
-        addLog("🔑 Got ID token, syncing backend...");
 
         await axios.post(
           `/api/auth/google`,
@@ -139,7 +120,6 @@ export default function Navbar() {
 
         handleCloseAuth();
       } catch (e) {
-        addLog("❌ Backend sync failed");
         toast.error("Session sync failed");
       }
     });
@@ -147,28 +127,7 @@ export default function Navbar() {
     return () => unsub();
   }, []);
 
-  useEffect(() => {
-    try {
-      const old = JSON.parse(localStorage.getItem("authDebug")) || [];
-      setDebugLog(old);
-    } catch {}
-  }, []);
 
-  useEffect(() => {
-    addLog("🚀 Checking redirect result...");
-
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result?.user) {
-          addLog("🎯 Redirect returned user: " + result.user.email);
-        } else {
-          addLog("ℹ️ No redirect user found");
-        }
-      })
-      .catch((err) => {
-        addLog("❌ redirect error: " + err.message);
-      });
-  }, []);
 
   const handleGoogleSignIn = async () => {
     toast.loading("Signing you in...", { id: "google-auth" });
@@ -587,21 +546,6 @@ export default function Navbar() {
         onClose={handleCloseAuth}
         onGoogleSignIn={handleGoogleSignIn}
       />
-      <div
-        style={{
-          position: "fixed",
-          bottom: 10,
-          left: 10,
-          fontSize: 10,
-          background: "#0003",
-          padding: 6,
-          color: "#000",
-        }}
-      >
-        {debugLog.map((l, i) => (
-          <div key={i}>{l}</div>
-        ))}
-      </div>
     </>
   );
 }
