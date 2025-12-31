@@ -46,7 +46,17 @@ export default function Navbar() {
   const [mobileCategories, setMobileCategories] = useState(false);
   const [categories, setCategories] = useState([]);
   const [debugLog, setDebugLog] = useState([]);
-  const addLog = (msg) => setDebugLog((p) => [...p, msg]);
+  const addLog = (msg) => {
+    console.log("🔍 LOG:", msg);
+
+    setDebugLog((p) => [...p, msg]);
+
+    try {
+      const old = JSON.parse(localStorage.getItem("authDebug")) || [];
+      old.push(msg);
+      localStorage.setItem("authDebug", JSON.stringify(old));
+    } catch {}
+  };
 
   useEffect(() => {
     initAuthListener(dispatch);
@@ -93,12 +103,22 @@ export default function Navbar() {
   }, [openProfileMenu]);
 
   useEffect(() => {
+    addLog("👀 Setting up Firebase auth observer...");
+
     const unsub = auth.onAuthStateChanged(async (user) => {
-      if (!user) return;
+      if (!user) {
+        addLog("🙅 No Firebase user found after auth change");
+        return;
+      }
+
+      addLog("🎯 Firebase user detected");
+      addLog("📧 " + user.email);
 
       try {
         const token = await user.getIdToken();
+        addLog("🔐 Got Firebase token");
 
+        addLog("📨 Calling /api/auth/google...");
         await axios.post(
           `/api/auth/google`,
           {
@@ -110,15 +130,19 @@ export default function Navbar() {
           { withCredentials: true }
         );
 
+        addLog("👤 Fetching /api/user/me...");
         const res = await axios.get(`/api/user/me`, {
           withCredentials: true,
         });
 
         dispatch(setCurrentUser(res.data.user));
 
+        addLog("🎉 LOGIN SUCCESS");
         toast.success("Logged in successfully 🎉", { id: "google-auth" });
         handleCloseAuth();
       } catch (err) {
+        addLog("❌ ERROR syncing with backend");
+        addLog(err?.message || JSON.stringify(err));
         toast.error("Session sync failed");
       }
     });
@@ -126,17 +150,38 @@ export default function Navbar() {
     return () => unsub();
   }, []);
 
+  useEffect(() => {
+    try {
+      const old = JSON.parse(localStorage.getItem("authDebug")) || [];
+      setDebugLog(old);
+    } catch {}
+  }, []);
+
   const handleGoogleSignIn = async () => {
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+    addLog("👉 Google signin clicked");
+    addLog("📱 UA = " + ua);
+    addLog("🍏 isIOS = " + isIOS);
 
     toast.loading("Signing you in...", { id: "google-auth" });
 
-    if (isIOS) {
-      await signInWithRedirect(auth, googleProvider);
-      return;
-    }
+    try {
+      if (isIOS) {
+        addLog("🔁 Using signInWithRedirect()");
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
 
-    await signInWithPopup(auth, googleProvider);
+      addLog("🪟 Using signInWithPopup()");
+      await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      addLog("❌ ERROR during signIn");
+      addLog(err?.message || JSON.stringify(err));
+
+      toast.error("Google sign-in failed", { id: "google-auth" });
+    }
   };
 
   const handleLogout = async () => {
