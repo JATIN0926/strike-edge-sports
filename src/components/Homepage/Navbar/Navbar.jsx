@@ -171,29 +171,16 @@ export default function Navbar() {
   }, []);
 
   const handleGoogleSignIn = async () => {
-    const ua = navigator.userAgent;
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
-    addLog("👉 Google signin clicked");
-    addLog("📱 UA = " + ua);
-    addLog("🍏 isIOS = " + isIOS);
-
     toast.loading("Signing you in...", { id: "google-auth" });
 
     try {
-      if (isIOS) {
-        addLog("🔁 Using signInWithRedirect()");
-        await signInWithRedirect(auth, googleProvider);
-        return;
-      }
-
-      addLog("🪟 Using signInWithPopup()");
+      // Try popup first
       await signInWithPopup(auth, googleProvider);
     } catch (err) {
-      addLog("❌ ERROR during signIn");
-      addLog(err?.message || JSON.stringify(err));
+      console.log("Popup blocked — using redirect", err?.message);
 
-      toast.error("Google sign-in failed", { id: "google-auth" });
+      // Fallback to redirect (Safari)
+      await signInWithRedirect(auth, googleProvider);
     }
   };
 
