@@ -2,11 +2,7 @@
 
 import AuthModal from "@/components/Auth/AuthModal";
 import { auth, googleProvider } from "@/utils/firebase";
-import axios from "axios";
-import {
-  signInWithPopup,
-  signInWithRedirect,
-} from "firebase/auth";
+import { signInWithPopup, signInWithRedirect } from "firebase/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -17,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { initAuthListener } from "@/utils/authListener";
 import { setCurrentUser, setShowAuthModal } from "@/redux/slices/userSlice";
 import CategoryDropdown from "./CategoryDropdown";
+import axiosInstance from "@/utils/axiosInstance";
 
 const navItems = [
   { label: "Home", type: "route", href: "/" },
@@ -52,7 +49,7 @@ export default function Navbar() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get(`/api/categories`);
+        const res = await axiosInstance.get(`/api/categories`);
         setCategories(res.data.categories || []);
       } catch {}
     };
@@ -90,7 +87,6 @@ export default function Navbar() {
   }, [openProfileMenu]);
 
   useEffect(() => {
-
     const unsub = auth.onAuthStateChanged(async (user) => {
       if (!user) {
         return;
@@ -99,7 +95,7 @@ export default function Navbar() {
       try {
         const token = await user.getIdToken();
 
-        await axios.post(
+        await axiosInstance.post(
           `/api/auth/google`,
           {
             name: user.displayName,
@@ -110,7 +106,7 @@ export default function Navbar() {
           { withCredentials: true }
         );
 
-        const res = await axios.get(`/api/user/me`, {
+        const res = await axiosInstance.get(`/api/user/me`, {
           withCredentials: true,
         });
 
@@ -126,8 +122,6 @@ export default function Navbar() {
 
     return () => unsub();
   }, []);
-
-
 
   const handleGoogleSignIn = async () => {
     toast.loading("Signing you in...", { id: "google-auth" });
@@ -146,7 +140,11 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       await auth.signOut();
-      await axios.post(`/api/auth/logout`, {}, { withCredentials: true });
+      await axiosInstance.post(
+        `/api/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
       toast.success("Logged out successfully");
       setOpenProfileMenu(false);
     } catch {

@@ -1,11 +1,11 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/utils/firebase";
-import axios from "axios";
 import {
   setCurrentUser,
   logoutUser,
   setAuthChecked,
 } from "@/redux/slices/userSlice";
+import axiosInstance from "./axiosInstance";
 
 export const initAuthListener = (dispatch) => {
   onAuthStateChanged(auth, async (user) => {
@@ -15,7 +15,9 @@ export const initAuthListener = (dispatch) => {
         return;
       }
 
-      const res = await axios.get(`/api/user/me`, { withCredentials: true });
+      const res = await axiosInstance.get(`/api/user/me`, {
+        withCredentials: true,
+      });
 
       dispatch(setCurrentUser(res.data.user));
     } catch (err) {

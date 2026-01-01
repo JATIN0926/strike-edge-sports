@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -11,6 +10,7 @@ import ProductCard from "@/components/Homepage/BestSellers/ProductCard";
 import Pagination from "@/components/Products/Pagination";
 import ProductsToolbar from "@/components/Products/ProductsToolbar";
 import ProductCardSkeleton from "@/components/Products/ProductCardSkeleton";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LIMIT = 6;
@@ -26,7 +26,7 @@ export default function ProductsPage() {
   const category = searchParams.get("category") || "all";
 
   /* ================= LOCAL STATE ================= */
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); 
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +35,7 @@ export default function ProductsPage() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${API}/api/products`, {
+      const res = await axiosInstance.get(`/api/products`, {
         params: {
           page,
           limit: LIMIT,

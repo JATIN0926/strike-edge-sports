@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { clearCart } from "@/redux/slices/cartSlice";
 import AddAddressModal from "@/components/Profile/user/AddAddressModal";
 import { Phone } from "lucide-react";
+import axiosInstance from "@/utils/axiosInstance";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -112,7 +113,7 @@ export default function CheckoutPage() {
     try {
       toast.loading("Placing your order...", { id: "place-order" });
 
-      const res = await axios.post(`/api/orders`, payload, {
+      const res = await axiosInstance.post(`/api/orders`, payload, {
         withCredentials: true,
       });
 

@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { UploadCloud, X, Trash2, Plus, Package } from "lucide-react";
 import ProductDescriptionEditor from "./ProductDescriptionEditor";
+import axiosInstance from "@/utils/axiosInstance";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
 const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
@@ -31,15 +30,15 @@ export default function AddProduct() {
   });
 
   useEffect(() => {
-    axios
-      .get(`${API}/api/categories`)
+    axiosInstance
+      .get(`/api/categories`)
       .then((res) => setCategories(res.data.categories))
       .catch(() => toast.error("Failed to load categories"));
   }, []);
 
   useEffect(() => {
-    axios
-      .get(`${API}/api/product-types`)
+    axiosInstance
+      .get(`/api/product-types`)
       .then((res) => setProductTypes(res.data.productTypes))
       .catch(() => toast.error("Failed to load product types"));
   }, []);
@@ -108,7 +107,7 @@ export default function AddProduct() {
     setImages((prev) => prev.filter((i) => i.publicId !== img.publicId));
 
     try {
-      await axios.delete(`${API}/api/products/cloudinary`, {
+      await axiosInstance.delete(`/api/products/cloudinary`, {
         params: { publicId: img.publicId },
         withCredentials: true,
       });
@@ -137,8 +136,8 @@ export default function AddProduct() {
     toast.loading("Saving product...", { id: "save-product" });
 
     try {
-      await axios.post(
-        `${API}/api/products`,
+      await axiosInstance.post(
+        `/api/products`,
         {
           ...form,
           images,
@@ -401,7 +400,9 @@ export default function AddProduct() {
                       transition-all duration-200
                     "
                     value={attr.value}
-                    onChange={(e) => updateAttribute(i, "value", e.target.value)}
+                    onChange={(e) =>
+                      updateAttribute(i, "value", e.target.value)
+                    }
                   />
                   <button
                     onClick={() => removeAttribute(i)}
@@ -413,7 +414,11 @@ export default function AddProduct() {
                       transition-all duration-200
                     "
                   >
-                    <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" strokeWidth={2.5} />
+                    <Trash2
+                      size={16}
+                      className="sm:w-[18px] sm:h-[18px]"
+                      strokeWidth={2.5}
+                    />
                   </button>
                 </div>
               </motion.div>
@@ -525,7 +530,11 @@ export default function AddProduct() {
                         shadow-lg
                       "
                     >
-                      <X size={12} className="sm:w-[14px] sm:h-[14px]" strokeWidth={3} />
+                      <X
+                        size={12}
+                        className="sm:w-[14px] sm:h-[14px]"
+                        strokeWidth={3}
+                      />
                     </button>
                   </motion.div>
                 ))}

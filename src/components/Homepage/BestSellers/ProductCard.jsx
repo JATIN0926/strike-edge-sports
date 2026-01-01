@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, increaseQty, decreaseQty } from "@/redux/slices/cartSlice";
 import { Minus, Plus, ShoppingCart, Heart } from "lucide-react";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { toggleSavedProduct } from "@/redux/slices/userSlice";
+import axiosInstance from "@/utils/axiosInstance";
 
 export default function ProductCard({ product }) {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function ProductCard({ product }) {
     }
 
     try {
-      await axios.post(
+      await axiosInstance.post(
         `/api/products/saved/${product._id}`,
         {},
         { withCredentials: true }

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import AppLoader from "@/components/Loader/AppLoader";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LIMIT = 6;
@@ -43,7 +43,7 @@ export default function AdminOrdersReceived() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${API}/api/orders`, {
+      const res = await axiosInstance.get(`/api/orders`, {
         params: {
           page,
           limit: LIMIT,
@@ -70,8 +70,8 @@ export default function AdminOrdersReceived() {
     try {
       toast.loading("Updating status...", { id: "status" });
 
-      await axios.put(
-        `${API}/api/orders/${orderId}/status`,
+      await axiosInstance.put(
+        `/api/orders/${orderId}/status`,
         { status },
         { withCredentials: true }
       );
@@ -195,7 +195,8 @@ export default function AdminOrdersReceived() {
                     {order.user?.name || "Guest User"}
                   </p>
                   <p className="text-xs sm:text-sm text-black/50">
-                    Order ID: <span className="font-mono break-all">{order.orderId}</span>
+                    Order ID:{" "}
+                    <span className="font-mono break-all">{order.orderId}</span>
                   </p>
 
                   {/* Shipping Address */}

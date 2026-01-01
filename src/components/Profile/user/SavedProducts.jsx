@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import ProductCard from "@/components/Homepage/BestSellers/ProductCard";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -27,7 +27,7 @@ export default function SavedProducts() {
       try {
         setLoading(true);
 
-        const res = await axios.get(`${API}/api/products/saved`, {
+        const res = await axiosInstance.get(`/api/products/saved`, {
           withCredentials: true,
         });
 
@@ -47,15 +47,15 @@ export default function SavedProducts() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-black">
-        Saved Products ❤️
-      </h2>
+      <h2 className="text-2xl font-bold text-black">Saved Products ❤️</h2>
 
       {loading ? (
         <p className="text-black/60">Loading your saved items…</p>
       ) : !currentUser ? (
         <div className="p-10 rounded-2xl bg-white/70 border text-center">
-          <p className="text-lg font-semibold">Please login to view saved products</p>
+          <p className="text-lg font-semibold">
+            Please login to view saved products
+          </p>
         </div>
       ) : products.length === 0 ? (
         <motion.div

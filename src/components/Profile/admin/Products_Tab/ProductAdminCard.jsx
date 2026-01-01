@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
-import axios from "axios";
 import toast from "react-hot-toast";
 import DeleteProductModal from "./DeleteProductModal";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -23,7 +23,7 @@ export default function ProductAdminCard({ product, onRefresh }) {
     try {
       setLoading(true);
 
-      await axios.delete(`${API}/api/products/${product._id}`, {
+      await axiosInstance.delete(`/api/products/${product._id}`, {
         withCredentials: true,
       });
 
@@ -62,17 +62,21 @@ export default function ProductAdminCard({ product, onRefresh }) {
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          
+
           {/* Stock Badge */}
           <div className="absolute top-2 right-2">
-            <span className={`
+            <span
+              className={`
               px-2.5 py-1 rounded-full text-xs font-medium
               backdrop-blur-md border
-              ${product.stock > 0 
-                ? 'bg-green-50/90 text-green-700 border-green-200' 
-                : 'bg-red-50/90 text-red-700 border-red-200'}
-            `}>
-              {product.stock > 0 ? `Stock: ${product.stock}` : 'Out of Stock'}
+              ${
+                product.stock > 0
+                  ? "bg-green-50/90 text-green-700 border-green-200"
+                  : "bg-red-50/90 text-red-700 border-red-200"
+              }
+            `}
+            >
+              {product.stock > 0 ? `Stock: ${product.stock}` : "Out of Stock"}
             </span>
           </div>
         </div>
@@ -93,9 +97,7 @@ export default function ProductAdminCard({ product, onRefresh }) {
           </div>
 
           {product.productType && (
-            <p className="text-xs text-black/50">
-              Type: {product.productType}
-            </p>
+            <p className="text-xs text-black/50">Type: {product.productType}</p>
           )}
         </div>
 
@@ -113,7 +115,7 @@ export default function ProductAdminCard({ product, onRefresh }) {
               shadow-sm hover:shadow
             "
           >
-            <Pencil size={16} strokeWidth={2.5} /> 
+            <Pencil size={16} strokeWidth={2.5} />
             <span>Edit</span>
           </button>
 
@@ -129,7 +131,7 @@ export default function ProductAdminCard({ product, onRefresh }) {
               shadow-sm hover:shadow
             "
           >
-            <Trash2 size={16} strokeWidth={2.5} /> 
+            <Trash2 size={16} strokeWidth={2.5} />
             <span>Delete</span>
           </button>
         </div>

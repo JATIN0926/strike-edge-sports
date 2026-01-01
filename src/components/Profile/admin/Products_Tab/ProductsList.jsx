@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import ProductAdminCard from "./ProductAdminCard";
 import AppLoader from "@/components/Loader/AppLoader";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 const LIMIT = 6;
@@ -27,7 +27,7 @@ export default function ProductsList() {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${API}/api/products`, {
+      const res = await axiosInstance.get(`/api/products`, {
         params: {
           page: pageNumber,
           limit: LIMIT,
@@ -84,9 +84,7 @@ export default function ProductsList() {
         <h2 className="text-xl sm:text-2xl font-bold text-black/90">
           Products
         </h2>
-        <p className="text-sm text-black/50 mt-1">
-          Manage all listed products
-        </p>
+        <p className="text-sm text-black/50 mt-1">Manage all listed products</p>
       </motion.div>
 
       {/* Search */}
@@ -223,7 +221,8 @@ export default function ProductsList() {
               </button>
 
               <span className="text-sm text-black/70 px-2">
-                Page <strong className="text-black/90">{page}</strong> of {totalPages}
+                Page <strong className="text-black/90">{page}</strong> of{" "}
+                {totalPages}
               </span>
 
               <button

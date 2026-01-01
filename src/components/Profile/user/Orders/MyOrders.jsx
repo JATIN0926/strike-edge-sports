@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import {
@@ -16,6 +15,7 @@ import Link from "next/link";
 import OrderStatusBadge from "./OrderStatusBadge";
 import CancelOrderModal from "./CancelOrderModal";
 import AppLoader from "@/components/Loader/AppLoader";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,7 +28,7 @@ export default function MyOrders() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API}/api/orders/my`, {
+      const res = await axiosInstance.get(`/api/orders/my`, {
         withCredentials: true,
       });
       setOrders(res.data.orders);
@@ -47,8 +47,8 @@ export default function MyOrders() {
     try {
       toast.loading("Cancelling order...", { id: "cancel" });
 
-      await axios.put(
-        `${API}/api/orders/${cancelOrderId}/cancel`,
+      await axiosInstance.put(
+        `/api/orders/${cancelOrderId}/cancel`,
         { reason },
         { withCredentials: true }
       );

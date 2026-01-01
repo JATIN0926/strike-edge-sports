@@ -7,9 +7,9 @@ import { Info, Plus } from "lucide-react";
 import AddAddressModal from "./user/AddAddressModal";
 import toast from "react-hot-toast";
 import { setCurrentUser } from "@/redux/slices/userSlice";
-import axios from "axios";
 import DeleteAddressModal from "./user/DeleteAddressModal";
 import AppLoader from "../Loader/AppLoader";
+import axiosInstance from "@/utils/axiosInstance";
 
 export default function ProfileInfo() {
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -57,7 +57,7 @@ export default function ProfileInfo() {
     try {
       toast.loading("Saving changes...", { id: "profile-save" });
 
-      const res = await axios.put(
+      const res = await axiosInstance.put(
         `/api/user/profile`,
         { name: name.trim(), phone },
         { withCredentials: true }
@@ -77,7 +77,9 @@ export default function ProfileInfo() {
 
   const fetchLatestUser = async () => {
     try {
-      const res = await axios.get(`/api/user/me`, { withCredentials: true });
+      const res = await axiosInstance.get(`/api/user/me`, {
+        withCredentials: true,
+      });
 
       dispatch(setCurrentUser(res.data.user));
     } catch (err) {
@@ -91,7 +93,7 @@ export default function ProfileInfo() {
     try {
       toast.loading("Deleting address...", { id: "delete-address" });
 
-      await axios.delete(`/api/user/address/${addressToDelete._id}`, {
+      await axiosInstance.delete(`/api/user/address/${addressToDelete._id}`, {
         withCredentials: true,
       });
 
@@ -112,7 +114,7 @@ export default function ProfileInfo() {
     try {
       toast.loading("Updating default address...", { id: "default-address" });
 
-      const res = await axios.patch(
+      const res = await axiosInstance.patch(
         `/api/user/address/${addressId}/default`,
         {},
         { withCredentials: true }

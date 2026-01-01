@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import ProductCard from "../BestSellers/ProductCard";
 import ProductCardSkeleton from "@/components/Products/ProductCardSkeleton";
 import { ArrowRight } from "lucide-react";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -33,8 +34,8 @@ export default function BallsSection() {
     try {
       setLoading(true);
 
-      const res = await axios.get(
-        `${API}/api/products/category/${BALL_TYPES[typeKey].slug}`,
+      const res = await axiosInstance.get(
+        `/api/products/category/${BALL_TYPES[typeKey].slug}`,
         {
           params: {
             type: "ball",

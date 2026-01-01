@@ -2,11 +2,11 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import ProductCard from "../BestSellers/ProductCard";
 import ProductCardSkeleton from "@/components/Products/ProductCardSkeleton";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -34,7 +34,7 @@ export default function BatsSection() {
 
         const { slug } = BAT_CATEGORIES[activeType];
 
-        const res = await axios.get(`${API}/api/products/category/${slug}`, {
+        const res = await axiosInstance.get(`/api/products/category/${slug}`, {
           params: {
             type: "bat",
             limit: 3,
@@ -168,11 +168,11 @@ export default function BatsSection() {
             >
               {/* Background shimmer effect */}
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
-              
+
               <span className="relative">Explore</span>
-              <ArrowRight 
+              <ArrowRight
                 size={16}
-                className="relative group-hover:translate-x-1 transition-transform duration-300 sm:w-[18px] sm:h-[18px]" 
+                className="relative group-hover:translate-x-1 transition-transform duration-300 sm:w-[18px] sm:h-[18px]"
                 strokeWidth={2.5}
               />
             </motion.button>

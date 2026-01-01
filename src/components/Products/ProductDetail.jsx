@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -16,6 +15,7 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, increaseQty, decreaseQty } from "@/redux/slices/cartSlice";
+import axiosInstance from "@/utils/axiosInstance";
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -33,12 +33,12 @@ export default function ProductDetail({ productId }) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`${API}/api/products/${productId}`);
+        const res = await axiosInstance.get(`/api/products/${productId}`);
         setProduct(res.data);
 
         // fetch related (same category)
-        const relatedRes = await axios.get(
-          `${API}/api/products/${res.data._id}/related`
+        const relatedRes = await axiosInstance.get(
+          `/api/products/${res.data._id}/related`
         );
 
         setRelated(relatedRes.data);

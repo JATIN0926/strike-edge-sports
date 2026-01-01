@@ -7,7 +7,7 @@ import { createPortal } from "react-dom";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { setCurrentUser } from "@/redux/slices/userSlice";
-import axios from "axios";
+import axiosInstance from "@/utils/axiosInstance";
 
 export default function AddAddressModal({
   open,
@@ -157,11 +157,15 @@ export default function AddAddressModal({
       let res;
 
       if (mode === "edit") {
-        res = await axios.put(`/api/user/address/${initialData._id}`, form, {
-          withCredentials: true,
-        });
+        res = await axiosInstance.put(
+          `/api/user/address/${initialData._id}`,
+          form,
+          {
+            withCredentials: true,
+          }
+        );
       } else {
-        res = await axios.post(`/api/user/address`, form, {
+        res = await axiosInstance.post(`/api/user/address`, form, {
           withCredentials: true,
         });
       }

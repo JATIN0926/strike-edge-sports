@@ -7,8 +7,8 @@ import toast from "react-hot-toast";
 import { UploadCloud, X, Trash2, Plus, Edit3 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ProductDescriptionEditor from "../Profile/admin/ProductDescriptionEditor";
+import axiosInstance from "@/utils/axiosInstance";
 
-const API = process.env.NEXT_PUBLIC_API_URL;
 const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
@@ -35,7 +35,7 @@ export default function EditProduct({ productId }) {
   /* ---------------- Fetch Categories ---------------- */
   useEffect(() => {
     axios
-      .get(`${API}/api/categories`)
+      .get(`/api/categories`)
       .then((res) => setCategories(res.data.categories))
       .catch(() => toast.error("Failed to load categories"));
   }, []);
@@ -44,7 +44,7 @@ export default function EditProduct({ productId }) {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`${API}/api/products/${productId}`, {
+        const res = await axiosInstance.get(`/api/products/${productId}`, {
           withCredentials: true,
         });
 
@@ -139,7 +139,7 @@ export default function EditProduct({ productId }) {
     setImages((prev) => prev.filter((i) => i.publicId !== img.publicId));
 
     try {
-      await axios.delete(`${API}/api/products/cloudinary`, {
+      await axiosInstance.delete(`/api/products/cloudinary`, {
         params: { publicId: img.publicId },
         withCredentials: true,
       });
@@ -166,8 +166,8 @@ export default function EditProduct({ productId }) {
     toast.loading("Updating product...", { id: "update-product" });
 
     try {
-      await axios.put(
-        `${API}/api/products/${productId}`,
+      await axiosInstance.put(
+        `/api/products/${productId}`,
         {
           ...form,
           images,
@@ -395,7 +395,7 @@ export default function EditProduct({ productId }) {
           <label className="block text-xs sm:text-sm font-semibold mb-3 text-black/80">
             Product Attributes
           </label>
-          
+
           <AnimatePresence>
             {form.attributes.map((attr, i) => (
               <motion.div
@@ -415,9 +415,7 @@ export default function EditProduct({ productId }) {
                     transition-all duration-200
                   "
                   value={attr.key}
-                  onChange={(e) =>
-                    updateAttribute(i, "key", e.target.value)
-                  }
+                  onChange={(e) => updateAttribute(i, "key", e.target.value)}
                 />
                 <div className="flex gap-2">
                   <input
@@ -443,7 +441,11 @@ export default function EditProduct({ productId }) {
                       transition-all duration-200
                     "
                   >
-                    <Trash2 size={16} className="sm:w-[18px] sm:h-[18px]" strokeWidth={2.5} />
+                    <Trash2
+                      size={16}
+                      className="sm:w-[18px] sm:h-[18px]"
+                      strokeWidth={2.5}
+                    />
                   </button>
                 </div>
               </motion.div>
@@ -555,7 +557,11 @@ export default function EditProduct({ productId }) {
                         shadow-lg
                       "
                     >
-                      <X size={12} className="sm:w-[14px] sm:h-[14px]" strokeWidth={3} />
+                      <X
+                        size={12}
+                        className="sm:w-[14px] sm:h-[14px]"
+                        strokeWidth={3}
+                      />
                     </button>
                   </motion.div>
                 ))}
