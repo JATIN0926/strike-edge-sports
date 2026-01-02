@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { UploadCloud, X, Trash2, Plus, Edit3 } from "lucide-react";
@@ -34,7 +33,7 @@ export default function EditProduct({ productId }) {
 
   /* ---------------- Fetch Categories ---------------- */
   useEffect(() => {
-    axios
+    axiosInstance
       .get(`/api/categories`)
       .then((res) => setCategories(res.data.categories))
       .catch(() => toast.error("Failed to load categories"));

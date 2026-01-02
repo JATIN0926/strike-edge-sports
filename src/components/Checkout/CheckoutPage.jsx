@@ -1,20 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import axios from "axios";
-import { useDispatch } from "react-redux";
 import { clearCart } from "@/redux/slices/cartSlice";
 import AddAddressModal from "@/components/Profile/user/AddAddressModal";
 import { Phone } from "lucide-react";
+import { load } from "@cashfreepayments/cashfree-js";
 import axiosInstance from "@/utils/axiosInstance";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const currentUser = useSelector((state) => state.user.currentUser);
   const cartItems = useSelector((state) => state.cart.items);
@@ -25,17 +25,30 @@ export default function CheckoutPage() {
   const [editAddress, setEditAddress] = useState(null);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
-
-  const dispatch = useDispatch();
+  const [cashfree, setCashfree] = useState(null);
 
   useEffect(() => {
-    // Only redirect to cart if cart is empty on initial load
+    const init = async () => {
+      try {
+        const cf = await load({
+          mode: "sandbox", // change to "production" later
+        });
+
+        setCashfree(cf);
+      } catch (err) {
+        console.log("Cashfree init failed", err);
+      }
+    };
+
+    init();
+  }, []);
+
+  useEffect(() => {
     if (cartArray.length === 0 && !isPlacingOrder) {
       router.replace("/cart");
     }
   }, []);
 
-  /* ---------------- Auto-select default address ---------------- */
   useEffect(() => {
     if (!currentUser?.addresses?.length) return;
 
@@ -46,7 +59,6 @@ export default function CheckoutPage() {
     setSelectedAddressId(defaultAddr._id);
   }, [currentUser]);
 
-  /* ---------------- Totals ---------------- */
   const subtotal = cartArray.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -57,29 +69,16 @@ export default function CheckoutPage() {
 
   const addresses = currentUser?.addresses || [];
 
+  /* ================== HANDLE ORDER ================== */
   const handlePlaceOrder = async () => {
     if (!addresses.length) {
       setOpenAddressModal(true);
-
-      toast("Add a delivery address to place your order 🙂", {
-        icon: "📦",
-      });
-
+      toast("Add a delivery address to place your order 🙂", { icon: "📦" });
       return;
     }
 
     if (!selectedAddressId) {
-      toast("Please select a delivery address", {
-        icon: "📍",
-      });
-      return;
-    }
-
-    setIsPlacingOrder(true);
-
-    if (paymentMethod !== "cod") {
-      setIsPlacingOrder(false);
-      toast("Online payment coming soon 🚀");
+      toast("Please select a delivery address", { icon: "📍" });
       return;
     }
 
@@ -104,31 +103,74 @@ export default function CheckoutPage() {
         country: selectedAddress.country || "India",
       },
 
-      paymentMethod: "COD",
       subtotal,
       deliveryCharge,
       totalAmount: total,
     };
 
-    try {
-      toast.loading("Placing your order...", { id: "place-order" });
+    console.log("payload", payload);
 
-      const res = await axiosInstance.post(`/api/orders`, payload, {
-        withCredentials: true,
-      });
+    setIsPlacingOrder(true);
 
-      toast.success("Order placed successfully 🎉", { id: "place-order" });
+    /* ========== COD FLOW ========== */
+    if (paymentMethod === "cod") {
+      try {
+        toast.loading("Placing your order...", { id: "place-order" });
 
-      router.replace("/order-success");
-      setTimeout(() => {
-        dispatch(clearCart());
-      }, 500);
-    } catch (err) {
-      setIsPlacingOrder(false);
-      console.log(err);
-      toast.error(err?.response?.data?.message || "Failed to place order", {
-        id: "place-order",
-      });
+        await axiosInstance.post(`/api/orders`, {
+          ...payload,
+          paymentMethod: "COD",
+        });
+
+        toast.success("Order placed successfully 🎉", {
+          id: "place-order",
+        });
+
+        router.replace("/order-success");
+
+        setTimeout(() => dispatch(clearCart()), 500);
+      } catch (err) {
+        toast.error(err?.response?.data?.message || "Failed to place order", {
+          id: "place-order",
+        });
+      } finally {
+        setIsPlacingOrder(false);
+      }
+
+      return;
+    }
+
+    if (paymentMethod === "online") {
+      try {
+        toast.loading("Redirecting to payment...", { id: "pay" });
+
+        const res = await axiosInstance.post(
+          `/api/payments/cashfree/create-order`,
+          payload
+        );
+
+        console.log("res", res.data);
+
+        const { payment_session_id } = res.data;
+
+        if (!cashfree) {
+          toast.error("Payment SDK not ready , Please Contact Us");
+          return;
+        }
+
+        toast.dismiss("pay");
+
+        cashfree.checkout({
+          paymentSessionId: payment_session_id,
+          redirectTarget: "_self",
+        });
+      } catch (err) {
+        console.log(err);
+        toast.error("Payment init failed");
+        setIsPlacingOrder(false);
+      }
+
+      return;
     }
   };
 
@@ -368,19 +410,16 @@ export default function CheckoutPage() {
                 type="radio"
                 checked={paymentMethod === "cod"}
                 onChange={() => setPaymentMethod("cod")}
-                className="accent-emerald-600 mt-0.5 sm:mt-0 flex-shrink-0"
+                className="accent-emerald-600"
               />
-              <div className="flex-1 min-w-0">
+              <div className="flex-1">
                 <p className="text-xs sm:text-sm font-medium">
                   Cash on Delivery
                 </p>
-                <p className="text-[10px] sm:text-xs text-black/60 mt-0.5">
-                  Pay when the product is delivered
+                <p className="text-[10px] sm:text-xs text-black/60">
+                  Pay when product is delivered
                 </p>
               </div>
-              <span className="text-[9px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap flex-shrink-0">
-                Recommended
-              </span>
             </label>
 
             {/* ONLINE */}
@@ -398,17 +437,14 @@ export default function CheckoutPage() {
                 type="radio"
                 checked={paymentMethod === "online"}
                 onChange={() => setPaymentMethod("online")}
-                className="accent-emerald-600 mt-0.5 sm:mt-0 flex-shrink-0"
+                className="accent-emerald-600"
               />
-              <div className="flex-1 min-w-0">
+              <div className="flex-1">
                 <p className="text-xs sm:text-sm font-medium">Online Payment</p>
-                <p className="text-[10px] sm:text-xs text-black/60 mt-0.5">
-                  UPI, Cards, Netbanking
+                <p className="text-[10px] sm:text-xs text-black/60">
+                  Pay securely using UPI / Cards / Netbanking
                 </p>
               </div>
-              <span className="text-[9px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-black/5 text-black/60 whitespace-nowrap flex-shrink-0">
-                Coming Soon
-              </span>
             </label>
           </div>
 
@@ -416,22 +452,17 @@ export default function CheckoutPage() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
+            disabled={isPlacingOrder}
             onClick={handlePlaceOrder}
-            className={`
+            className="
               cursor-pointer
-              w-full mt-4 sm:mt-6 py-2.5 sm:py-3 rounded-full font-medium text-xs sm:text-sm transition
-              ${
-                addresses.length === 0
-                  ? "bg-black/60 text-white"
-                  : !selectedAddressId
-                  ? "bg-black/70 text-white"
-                  : "bg-black text-white hover:bg-emerald-600"
-              }
-            `}
+              w-full mt-4 sm:mt-6 py-2.5 sm:py-3 rounded-full
+              bg-black text-white hover:bg-emerald-600
+            "
           >
             {paymentMethod === "cod"
               ? "Place Order (COD)"
-              : "Proceed to Payment"}
+              : "Proceed to Pay Securely"}
           </motion.button>
 
           <p className="text-[10px] sm:text-xs text-black/60 text-center">
@@ -440,7 +471,6 @@ export default function CheckoutPage() {
         </motion.div>
       </div>
 
-      {/* ---------- Address Modal ---------- */}
       <AddAddressModal
         open={openAddressModal}
         onClose={() => setOpenAddressModal(false)}

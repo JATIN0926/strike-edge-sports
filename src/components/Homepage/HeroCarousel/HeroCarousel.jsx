@@ -9,19 +9,19 @@ import { useRouter } from "next/navigation";
 const slides = [
   {
     id: 1,
-    image: "/images/hero1.jpg",
+    image: "/images/hero1.png",
     title: "Gear Up Like a Pro",
     desc: "Premium cricket bats, balls & accessories trusted by players.",
   },
   {
     id: 2,
-    image: "/images/hero2.jpg",
+    image: "/images/hero2.png",
     title: "Built for Match Day",
     desc: "High-performance gear crafted for serious cricketers.",
   },
   {
     id: 3,
-    image: "/images/hero3.jpg",
+    image: "/images/hero3.png",
     title: "Play With Confidence",
     desc: "Train harder. Play smarter. Win bigger.",
   },
@@ -49,8 +49,8 @@ export default function HeroCarousel() {
     <div
       className="
         relative w-full 
-        h-[400px] xs:h-[450px] sm:h-[500px] md:h-[600px] lg:h-[70vh] xl:h-[75vh]
-        max-h-[800px]
+        h-[400px] xs:h-[450px] sm:h-[500px] md:h-[600px] lg:h-[40rem] xl:h-[45rem]
+        
         rounded-2xl sm:rounded-3xl overflow-hidden group bg-white 
         shadow-xl sm:shadow-2xl shadow-black/10
       "
@@ -66,7 +66,6 @@ export default function HeroCarousel() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
         >
-          {/* Image */}
           <Image
             src={slides[index].image}
             alt="Cricket Banner"
@@ -76,11 +75,11 @@ export default function HeroCarousel() {
           />
 
           {/* Enhanced gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          {/* <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" /> */}
 
           {/* Content */}
-          <div className="absolute inset-0 flex items-center px-4 sm:px-6 md:px-10 lg:px-14">
+          {/* <div className="absolute inset-0 flex items-center px-4 sm:px-6 md:px-10 lg:px-14">
             <motion.div
               initial={{ x: -50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -141,7 +140,7 @@ export default function HeroCarousel() {
                   relative overflow-hidden
                 "
               >
-                {/* Shimmer effect */}
+            
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-700" />
 
                 <span className="relative">Shop Now</span>
@@ -152,7 +151,7 @@ export default function HeroCarousel() {
                 />
               </motion.button>
             </motion.div>
-          </div>
+          </div> */}
         </motion.div>
       </AnimatePresence>
 
