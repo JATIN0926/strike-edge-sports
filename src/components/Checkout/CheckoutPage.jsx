@@ -31,7 +31,7 @@ export default function CheckoutPage() {
     const init = async () => {
       try {
         const cf = await load({
-          mode: "sandbox", // change to "production" later
+          mode: "production",
         });
 
         setCashfree(cf);
