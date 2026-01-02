@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { initAuthListener } from "@/utils/authListener";
-import { setCurrentUser, setShowAuthModal } from "@/redux/slices/userSlice";
+import { logoutUser, setCurrentUser, setShowAuthModal } from "@/redux/slices/userSlice";
 import CategoryDropdown from "./CategoryDropdown";
 import axiosInstance from "@/utils/axiosInstance";
 
@@ -87,8 +87,11 @@ export default function Navbar() {
   }, [openProfileMenu]);
 
   useEffect(() => {
+    let firstEvent = true;
+
     const unsub = auth.onAuthStateChanged(async (user) => {
       if (!user) {
+        dispatch(logoutUser());
         return;
       }
 
@@ -112,16 +115,21 @@ export default function Navbar() {
 
         dispatch(setCurrentUser(res.data.user));
 
-        toast.success("Logged in successfully 🎉", { id: "google-auth" });
+        if (!firstEvent) {
+          toast.success("Logged in successfully 🎉", { id: "google-auth" });
+        }
 
         handleCloseAuth();
       } catch (e) {
         toast.error("Session sync failed");
       }
+
+      // After first callback — mark done
+      firstEvent = false;
     });
 
     return () => unsub();
-  }, []);
+  }, [dispatch]);
 
   const handleGoogleSignIn = async () => {
     toast.loading("Signing you in...", { id: "google-auth" });
@@ -139,15 +147,18 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
       await axiosInstance.post(
         `/api/auth/logout`,
         {},
         { withCredentials: true }
       );
+
+      await auth.signOut();
+
+      dispatch(logoutUser());
+
       toast.success("Logged out successfully");
-      setOpenProfileMenu(false);
-    } catch {
+    } catch (err) {
       toast.error("Logout failed");
     }
   };

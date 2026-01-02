@@ -71,7 +71,7 @@ export default function HeroCarousel() {
             alt="Cricket Banner"
             fill
             priority
-            className="object-cover"
+            className="object-cover aspect-video"
           />
 
           {/* Enhanced gradient overlay */}
