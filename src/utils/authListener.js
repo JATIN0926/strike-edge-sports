@@ -15,14 +15,13 @@ export const initAuthListener = (dispatch) => {
         return;
       }
 
-      // 🔥 ONLY VERIFY BACKEND SESSION
       const res = await axiosInstance.get(`/api/user/me`, {
         withCredentials: true,
       });
 
       dispatch(setCurrentUser(res.data.user));
     } catch (err) {
-      // cookie expired OR backend session gone
+      console.log("Auth listener error:", err);
       dispatch(logoutUser());
     } finally {
       dispatch(setAuthChecked());

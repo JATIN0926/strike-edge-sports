@@ -11,11 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { initAuthListener } from "@/utils/authListener";
-import {
-  logoutUser,
-  setCurrentUser,
-  setShowAuthModal,
-} from "@/redux/slices/userSlice";
+import { setCurrentUser, setShowAuthModal } from "@/redux/slices/userSlice";
 import CategoryDropdown from "./CategoryDropdown";
 import axiosInstance from "@/utils/axiosInstance";
 
@@ -90,105 +86,68 @@ export default function Navbar() {
     };
   }, [openProfileMenu]);
 
-  // useEffect(() => {
-  //   let firstEvent = true;
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        return;
+      }
 
-  //   const unsub = auth.onAuthStateChanged(async (user) => {
-  //     if (!user) {
-  //       dispatch(logoutUser());
-  //       return;
-  //     }
+      try {
+        const token = await user.getIdToken();
 
-  //     try {
-  //       const token = await user.getIdToken();
+        await axiosInstance.post(
+          `/api/auth/google`,
+          {
+            name: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+            token,
+          },
+          { withCredentials: true }
+        );
 
-  //       await axiosInstance.post(
-  //         `/api/auth/google`,
-  //         {
-  //           name: user.displayName,
-  //           email: user.email,
-  //           photoURL: user.photoURL,
-  //           token,
-  //         },
-  //         { withCredentials: true }
-  //       );
+        const res = await axiosInstance.get(`/api/user/me`, {
+          withCredentials: true,
+        });
 
-  //       const res = await axiosInstance.get(`/api/user/me`, {
-  //         withCredentials: true,
-  //       });
+        dispatch(setCurrentUser(res.data.user));
 
-  //       dispatch(setCurrentUser(res.data.user));
+        toast.success("Logged in successfully 🎉", { id: "google-auth" });
 
-  //       if (!firstEvent) {
-  //         toast.success("Logged in successfully 🎉", { id: "google-auth" });
-  //       }
+        handleCloseAuth();
+      } catch (e) {
+        toast.error("Session sync failed");
+      }
+    });
 
-  //       handleCloseAuth();
-  //     } catch (e) {
-  //       toast.error("Session sync failed");
-  //     }
-
-  //     // After first callback — mark done
-  //     firstEvent = false;
-  //   });
-
-  //   return () => unsub();
-  // }, [dispatch]);
+    return () => unsub();
+  }, []);
 
   const handleGoogleSignIn = async () => {
     toast.loading("Signing you in...", { id: "google-auth" });
 
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const token = await result.user.getIdToken();
-
-      // create backend session
-      await axiosInstance.post(
-        `/api/auth/google`,
-        {
-          name: result.user.displayName,
-          email: result.user.email,
-          photoURL: result.user.photoURL,
-          token,
-        },
-        { withCredentials: true }
-      );
-
-      // 🔥 fetch session user immediately
-      const res = await axiosInstance.get(`/api/user/me`, {
-        withCredentials: true,
-      });
-
-      // 🔥 update redux instantly
-      dispatch(setCurrentUser(res.data.user));
-
-      toast.success("Logged in successfully 🎉", { id: "google-auth" });
-
-      handleCloseAuth();
+      // Try popup first
+      await signInWithPopup(auth, googleProvider);
     } catch (err) {
-      console.log(err);
-      toast.error("Login failed", { id: "google-auth" });
+      console.log("Popup blocked — using redirect", err?.message);
 
-      try {
-        await signInWithRedirect(auth, googleProvider);
-      } catch {}
+      // Fallback to redirect (Safari)
+      await signInWithRedirect(auth, googleProvider);
     }
   };
 
   const handleLogout = async () => {
     try {
+      await auth.signOut();
       await axiosInstance.post(
         `/api/auth/logout`,
         {},
         { withCredentials: true }
       );
-
-      await auth.signOut();
-
-      dispatch(logoutUser());
-
       toast.success("Logged out successfully");
-    } catch (err) {
+      setOpenProfileMenu(false);
+    } catch {
       toast.error("Logout failed");
     }
   };
