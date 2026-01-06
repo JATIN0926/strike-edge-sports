@@ -76,7 +76,6 @@ export default function Navbar() {
         setOpenProfileMenu(false);
       }
     };
-
     if (openProfileMenu) {
       document.addEventListener("mousedown", handleClickOutside);
     }
@@ -95,20 +94,16 @@ export default function Navbar() {
       try {
         const token = await user.getIdToken();
 
-        await axiosInstance.post(
-          `/api/auth/google`,
-          {
-            name: user.displayName,
-            email: user.email,
-            photoURL: user.photoURL,
-            token,
-          },
-          { withCredentials: true }
-        );
-
-        const res = await axiosInstance.get(`/api/user/me`, {
-          withCredentials: true,
+        const googleRes = await axiosInstance.post(`/api/auth/google`, {
+          name: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          token,
         });
+
+        console.log("googleRes", googleRes.data);
+
+        const res = await axiosInstance.get(`/api/user/me`, {});
 
         dispatch(setCurrentUser(res.data.user));
 
@@ -116,7 +111,7 @@ export default function Navbar() {
 
         handleCloseAuth();
       } catch (e) {
-        console.log(e);
+        console.log("error", e);
         toast.error("Session sync failed");
       }
     });
