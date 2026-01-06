@@ -116,6 +116,7 @@ export default function Navbar() {
 
         handleCloseAuth();
       } catch (e) {
+        console.log(e);
         toast.error("Session sync failed");
       }
     });
