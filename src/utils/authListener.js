@@ -1,7 +1,12 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/utils/firebase";
-import { setCurrentUser, logoutUser, setAuthChecked } from "@/redux/slices/userSlice";
+import {
+  setCurrentUser,
+  logoutUser,
+  setAuthChecked,
+} from "@/redux/slices/userSlice";
 import axiosInstance from "./axiosInstance";
+import toast from "react-hot-toast";
 
 export const initAuthListener = (dispatch) => {
   onAuthStateChanged(auth, async (user) => {
@@ -17,7 +22,7 @@ export const initAuthListener = (dispatch) => {
         name: user.displayName,
         email: user.email,
         photoURL: user.photoURL,
-        token
+        token,
       });
 
       const res = await axiosInstance.get(`/api/user/me`);
@@ -26,6 +31,7 @@ export const initAuthListener = (dispatch) => {
       toast.success("Logged in successfully 🎉", { id: "google-auth" });
     } catch (err) {
       console.log("Auth listener error:", err);
+      toast.success("Login Failed", { id: "google-auth" });
       dispatch(logoutUser());
     } finally {
       dispatch(setAuthChecked());
