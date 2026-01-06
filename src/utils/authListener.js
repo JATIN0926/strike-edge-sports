@@ -28,11 +28,14 @@ export const initAuthListener = (dispatch) => {
       const res = await axiosInstance.get(`/api/user/me`);
 
       dispatch(setCurrentUser(res.data.user));
+
+      dispatch(setShowAuthModal(false));
+
       toast.success("Logged in successfully 🎉", { id: "google-auth" });
     } catch (err) {
       console.log("Auth listener error:", err);
-      toast.success("Login Failed", { id: "google-auth" });
       dispatch(logoutUser());
+      toast.error("Login failed. Please try again.");
     } finally {
       dispatch(setAuthChecked());
     }
