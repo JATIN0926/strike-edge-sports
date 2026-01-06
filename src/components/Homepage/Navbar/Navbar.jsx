@@ -112,7 +112,7 @@ export default function Navbar() {
         handleCloseAuth();
       } catch (e) {
         console.log("error", e);
-        toast.error("Session sync failed");
+        toast.error("Session sync failed", { id: "google-auth" });
       }
     });
 
