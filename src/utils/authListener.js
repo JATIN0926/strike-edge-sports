@@ -4,6 +4,7 @@ import {
   setCurrentUser,
   logoutUser,
   setAuthChecked,
+  setShowAuthModal,
 } from "@/redux/slices/userSlice";
 import axiosInstance from "./axiosInstance";
 import toast from "react-hot-toast";
