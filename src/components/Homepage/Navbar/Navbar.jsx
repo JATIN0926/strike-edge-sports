@@ -85,50 +85,15 @@ export default function Navbar() {
     };
   }, [openProfileMenu]);
 
-  useEffect(() => {
-    const unsub = auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        return;
-      }
-
-      try {
-        const token = await user.getIdToken();
-
-        const googleRes = await axiosInstance.post(`/api/auth/google`, {
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-          token,
-        });
-
-        console.log("googleRes", googleRes.data);
-
-        const res = await axiosInstance.get(`/api/user/me`, {});
-
-        dispatch(setCurrentUser(res.data.user));
-
-        toast.success("Logged in successfully 🎉", { id: "google-auth" });
-
-        handleCloseAuth();
-      } catch (e) {
-        console.log("error", e);
-        toast.error("Session sync failed", { id: "google-auth" });
-      }
-    });
-
-    return () => unsub();
-  }, []);
 
   const handleGoogleSignIn = async () => {
     toast.loading("Signing you in...", { id: "google-auth" });
 
     try {
-      // Try popup first
       await signInWithPopup(auth, googleProvider);
     } catch (err) {
-      console.log("Popup blocked — using redirect", err?.message);
+      console.log("Popup blocked — using redirect", err);
 
-      // Fallback to redirect (Safari)
       await signInWithRedirect(auth, googleProvider);
     }
   };
