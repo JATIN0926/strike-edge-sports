@@ -10,10 +10,10 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { initAuthListener } from "@/utils/authListener";
 import { setCurrentUser, setShowAuthModal } from "@/redux/slices/userSlice";
 import CategoryDropdown from "./CategoryDropdown";
 import axiosInstance from "@/utils/axiosInstance";
+import { getRedirectResult } from "firebase/auth";
 
 const navItems = [
   { label: "Home", type: "route", href: "/" },
@@ -43,8 +43,27 @@ export default function Navbar() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    initAuthListener(dispatch);
-  }, [dispatch]);
+    const handleRedirectLogin = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (!result) return;
+
+        const token = await result.user.getIdToken();
+
+        await axiosInstance.post(`/api/auth/google`, { token });
+
+        const res = await axiosInstance.get(`/api/user/me`);
+        dispatch(setCurrentUser(res.data.user));
+
+        dispatch(setShowAuthModal(false));
+        toast.success("Logged in successfully 🎉", { id: "google-auth" });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    handleRedirectLogin();
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -85,16 +104,31 @@ export default function Navbar() {
     };
   }, [openProfileMenu]);
 
-
   const handleGoogleSignIn = async () => {
     toast.loading("Signing you in...", { id: "google-auth" });
 
     try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (err) {
-      console.log("Popup blocked — using redirect", err);
+      const result = await signInWithPopup(auth, googleProvider);
+      const token = await result.user.getIdToken();
 
-      await signInWithRedirect(auth, googleProvider);
+      await axiosInstance.post(`/api/auth/google`, { token });
+
+      const res = await axiosInstance.get(`/api/user/me`);
+
+      dispatch(setCurrentUser(res.data.user));
+
+      dispatch(setShowAuthModal(false));
+      toast.success("Logged in successfully 🎉", { id: "google-auth" });
+    } catch (popupErr) {
+      console.log("Popup failed. Trying redirect...", popupErr);
+
+      try {
+        // SAFARI / IOS FALLBACK
+        await signInWithRedirect(auth, googleProvider);
+      } catch (redirectErr) {
+        console.log("Redirect also failed", redirectErr);
+        toast.error("Login failed. Please try again.", { id: "google-auth" });
+      }
     }
   };
 
