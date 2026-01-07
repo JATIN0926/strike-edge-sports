@@ -50,15 +50,19 @@ export default function Navbar() {
 
         const token = await result.user.getIdToken();
 
-        await axiosInstance.post(`/api/auth/google`, { token });
+        await axiosInstance.post(`/api/auth/google`, {
+          token,
+        });
 
         const res = await axiosInstance.get(`/api/user/me`);
+
         dispatch(setCurrentUser(res.data.user));
 
         dispatch(setShowAuthModal(false));
         toast.success("Logged in successfully 🎉", { id: "google-auth" });
       } catch (err) {
-        console.log(err);
+        console.log("Redirect auth error:", err);
+        toast.error("Google login failed");
       }
     };
 
@@ -116,30 +120,33 @@ export default function Navbar() {
       const res = await axiosInstance.get(`/api/user/me`);
 
       dispatch(setCurrentUser(res.data.user));
-
       dispatch(setShowAuthModal(false));
-      toast.success("Logged in successfully 🎉", { id: "google-auth" });
-    } catch (popupErr) {
-      console.log("Popup failed. Trying redirect...", popupErr);
 
-      try {
-        // SAFARI / IOS FALLBACK
+      toast.success("Logged in successfully 🎉", { id: "google-auth" });
+    } catch (err) {
+      console.log("Popup login error:", err);
+
+      if (
+        err.code === "auth/popup-blocked" ||
+        err.code === "auth/popup-closed-by-user"
+      ) {
+        toast.loading("Opening Google sign-in…");
+
         await signInWithRedirect(auth, googleProvider);
-      } catch (redirectErr) {
-        console.log("Redirect also failed", redirectErr);
-        toast.error("Login failed. Please try again.", { id: "google-auth" });
+      } else {
+        toast.error("Login failed. Please try again.");
       }
     }
   };
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
-      await axiosInstance.post(
-        `/api/auth/logout`,
-        {},
-        { withCredentials: true }
-      );
+      const res1 = await auth.signOut();
+      const res2 = await axiosInstance.post(`/api/auth/logout`);
+
+      console.log(res1);
+      console.log(res2);
+      dispatch(setCurrentUser(null));
       toast.success("Logged out successfully");
       setOpenProfileMenu(false);
     } catch {
