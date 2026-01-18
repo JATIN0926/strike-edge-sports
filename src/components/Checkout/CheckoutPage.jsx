@@ -423,7 +423,8 @@ export default function CheckoutPage() {
             </label>
 
             {/* ONLINE */}
-            <label
+            {/* Implementation paused for now (payment gateway)  */}
+            {/* <label
               className={`
                 flex items-start sm:items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-lg sm:rounded-xl cursor-pointer border transition
                 ${
@@ -445,7 +446,7 @@ export default function CheckoutPage() {
                   Pay securely using UPI / Cards / Netbanking
                 </p>
               </div>
-            </label>
+            </label> */}
           </div>
 
           {/* ---------- CTA ---------- */}
